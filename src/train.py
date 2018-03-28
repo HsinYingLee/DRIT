@@ -56,13 +56,8 @@ def main():
         model.update_D(images_a, images_b)
         model.update_EG()
 
-      # decay learn rate
-      if opts.n_ep_decay > -1:
-        model.update_lr()
-
       # save to display file
       saver.write_display(total_it, model)
-
 
       print('total_it: %d (ep %d, it %d), lr %08f' % (total_it, ep, it, model.gen_opt.param_groups[0]['lr']))
       total_it += 1
@@ -70,6 +65,10 @@ def main():
         saver.write_img(-41608, model)
         saver.write_model(-41608, model)
         break
+
+    # decay learn rate
+    if opts.n_ep_decay > -1:
+      model.update_lr()
 
     # save result image
     saver.write_img(ep, model)
