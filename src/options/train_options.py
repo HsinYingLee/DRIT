@@ -6,9 +6,9 @@ class TrainOptions():
 
     # data loader related
     self.parser.add_argument('--dataroot', type=str, required=True, help='path of training data list, should contain data lists for both domains')
-    self.parser.add_argument('--listA', type=str, default='train_listA.txt', help='file name of data list in domain A')
-    self.parser.add_argument('--listB', type=str, default='train_listB.txt', help='file name of data list in domain B')
+    self.parser.add_argument('--phase', type=str, default='train', help='phase for dataloading')
     self.parser.add_argument('--batch_size', type=int, default=2, help='batch size')
+    self.parser.add_argument('--resize_size', type=int, default=256, help='resized image size for training')
     self.parser.add_argument('--crop_size', type=int, default=216, help='cropped image size for training')
     self.parser.add_argument('--input_dim_a', type=int, default=3, help='# of input channels for domain A')
     self.parser.add_argument('--input_dim_b', type=int, default=3, help='# of input channels for domain B')
@@ -25,8 +25,8 @@ class TrainOptions():
 
     # training related
     self.parser.add_argument('--lr_policy', type=str, default='lambda', help='type of learn rate decay')
-    self.parser.add_argument('--n_ep', type=int, default=400, help='number of epochs')
-    self.parser.add_argument('--n_ep_decay', type=int, default=200, help='epoch start decay learning rate, set -1 if no decay')
+    self.parser.add_argument('--n_ep', type=int, default=1200, help='number of epochs') # 400 * d_iter
+    self.parser.add_argument('--n_ep_decay', type=int, default=600, help='epoch start decay learning rate, set -1 if no decay') # 200 * d_iter
     self.parser.add_argument('--resume', type=str, default=None, help='specified the dir of saved models for resume the training')
     self.parser.add_argument('--d_iter', type=int, default=3, help='# of iterations for updating content discriminator')
     self.parser.add_argument('--gpu', type=int, default=0, help='gpu')
