@@ -1,10 +1,22 @@
-# DRIT
-ver1: ym41608, can train on normal I2I
-ver2: ym41608, 2 dataloader -> 1 dataloader, use torchvision.transform
+gif file
 
+# Diverse Image-to-Image Translation via Disentangled Representations
+[[Project Page]]()[[Paper]]()
 
-TODO:
-verify training result
-    ongoing: yosemite, apple2orrange
-    plan: photo to artwork, horse to zebra
-gradient clip for all network
+Pytorch implementation for diverse image-to-image translation method.
+
+## Paper
+Diverse Image-to-Image Translation via Disentangled Representations
+[Hsin-Ying Lee](http://vllab.ucmerced.edu/hylee/)\*, [Hung-Yu Tseng](https://sites.google.com/site/hytseng0509/), [Jia-Bin Huang](https://filebox.ece.vt.edu/~jbhuang/), [Maneesh Kumar Singh](https://scholar.google.com/citations?user=hdQhiFgAAAAJ), and [Ming-Hsuan Yang](http://faculty.ucmerced.edu/mhyang/)
+
+Please cite our paper if you find it useful for your research.
+
+## Example Results
+
+## Installation
+
+## Dataset
+
+## Training
+
+## Testing
