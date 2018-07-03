@@ -7,6 +7,7 @@ datasets/
 videos/
 logs/
 results/
+outputs/
 build/
 dist/
 *.png

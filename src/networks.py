@@ -3,6 +3,7 @@ import torch.nn as nn
 from torch.autograd import Variable
 import functools
 from torch.optim import lr_scheduler
+import torch.nn.functional as F
 
 # --------------- functions ------------------
 def get_scheduler(optimizer, opts, cur_ep=-1):
@@ -59,6 +60,48 @@ def gaussian_weights_init(m):
     m.weight.data.normal_(0.0, 0.02)
 
 # ----------- basic blocks ----------------
+class AdainNorm2d(nn.Module):
+  def __init__(self, n_out, eps=1e-5, momentum=0.1):
+    super(AdainNorm2d, self).__init__()
+    self.n_out = n_out
+    self.eps = eps
+    self.momentum = momentum
+    self.weight = None
+    self.bias = None
+    self.register_buffer('running_mean', torch.zeros(n_out))
+    self.register_buffer('running_var', torch.ones(n_out))
+    return
+  def forward(self, x):
+    assert self.weight is not None and self.bias is not None, "AdaNorm2d not initialized"
+    b, c = x.size(0), x.size(1)
+    running_mean = self.running_mean.repeat(b)
+    running_var = self.running_var.repeat(b)
+    x = x.contiguous().view(1, b*c, *x.size()[2:])
+    out = F.batch_norm(x, running_mean, running_var, self.weight, self.bias, True, self.momentum, self.eps)
+    return out.view(b, c, *x.size()[2:])
+  def __repr__(self):
+    return self.__class__.__name__ + '(' + str(self.n_out) + ')'
+
+class LayerNorm(nn.Module):
+  def __init__(self, n_out, eps=1e-5, affine=True):
+    super(LayerNorm, self).__init__()
+    self.n_out = n_out
+    self.affine = affine
+    self.eps = eps
+    if self.affine:
+      self.gamma = nn.Parameter(torch.Tensor(n_out).uniform_())
+      self.beta = nn.Parameter(torch.zeros(n_out))
+    return
+  def forward(self, x):
+    shape = [-1] + [1]*(x.dim() - 1)
+    mean = x.view(x.size(0), -1).mean(1).view(*shape)
+    std = x.view(x.size(0), -1).std(1).view(*shape)
+    x = (x - mean) / (std + self.eps)
+    if self.affine:
+      shape = [1, -1] + [1]*(x.dim() - 2)
+      x = x*self.gamma.view(*shape) + self.beta.view(*shape)
+    return x
+
 class BasicBlock(nn.Module):
   def __init__(self, inplanes, outplanes, norm_layer=None, nl_layer=None):
     super(BasicBlock, self).__init__()
@@ -121,6 +164,68 @@ class INSResBlock(nn.Module):
     out += residual
     return out
 
+class MisINSResBlock(nn.Module):
+  def conv3x3(self, dim_in, dim_out, stride=1):
+    return nn.Conv2d(dim_in, dim_out, kernel_size=3, stride=stride, padding=1)
+  def conv1x1(self, dim_in, dim_out):
+    return nn.Conv2d(dim_in, dim_out, kernel_size=1, stride=1, padding=0)
+  def __init__(self, dim, dim_extra, stride=1, dropout=0.0):
+    super(MisINSResBlock, self).__init__()
+    self.conv1 = nn.Sequential(
+        self.conv3x3(dim, dim, stride),
+        nn.InstanceNorm2d(dim))
+    self.conv2 = nn.Sequential(
+        self.conv3x3(dim, dim, stride),
+        nn.InstanceNorm2d(dim))
+    self.blk1 = nn.Sequential(
+        self.conv1x1(dim + dim_extra, dim + dim_extra),
+        nn.ReLU(inplace=False),
+        self.conv1x1(dim + dim_extra, dim),
+        nn.ReLU(inplace=False))
+    self.blk2 = nn.Sequential(
+        self.conv1x1(dim + dim_extra, dim + dim_extra),
+        nn.ReLU(inplace=False),
+        self.conv1x1(dim + dim_extra, dim),
+        nn.ReLU(inplace=False))
+    model = []
+    if dropout > 0:
+      model += [nn.Dropout(p=dropout)]
+    self.model = nn.Sequential(*model)
+    self.model.apply(gaussian_weights_init)
+    self.conv1.apply(gaussian_weights_init)
+    self.conv2.apply(gaussian_weights_init)
+    self.blk1.apply(gaussian_weights_init)
+    self.blk2.apply(gaussian_weights_init)
+  def forward(self, x, z):
+    residual = x
+    z_expand = z.view(z.size(0), z.size(1), 1, 1).expand(z.size(0), z.size(1), x.size(2), x.size(3))
+    o1 = self.conv1(x)
+    o2 = self.blk1(torch.cat([o1, z_expand], dim=1))
+    o3 = self.conv2(o2)
+    out = self.blk2(torch.cat([o3, z_expand], dim=1))
+    out += residual
+    return out
+
+class ADAINResBlock(nn.Module):
+  def conv3x3(self, inplanes, out_planes, stride=1):
+    return nn.Conv2d(inplanes, out_planes, kernel_size=3, stride=stride, padding=1)
+  def __init__(self, inplanes, planes, stride=1, dropout=0.0):
+    super(ADAINResBlock, self).__init__()
+    model = []
+    model += [self.conv3x3(inplanes, planes, stride)]
+    model += [AdainNorm2d(planes)]
+    model += [nn.ReLU(inplace=True)]
+    model += [self.conv3x3(planes, planes)]
+    if dropout > 0:
+      model += [nn.Dropout(p=dropout)]
+    self.model = nn.Sequential(*model)
+    self.model.apply(gaussian_weights_init)
+  def forward(self, x):
+    residual = x
+    out = self.model(x)
+    out += residual
+    return out
+
 class GaussianNoiseLayer(nn.Module):
   def __init__(self,):
     super(GaussianNoiseLayer, self).__init__()
@@ -135,7 +240,7 @@ class ReLUINSConvTranspose2d(nn.Module):
     super(ReLUINSConvTranspose2d, self).__init__()
     model = []
     model += [nn.ConvTranspose2d(n_in, n_out, kernel_size=kernel_size, stride=stride, padding=padding, output_padding=output_padding, bias=True)]
-    model += [nn.InstanceNorm2d(n_out, affine=False)]
+    model += [LayerNorm(n_out)]
     model += [nn.ReLU(inplace=True)]
     self.model = nn.Sequential(*model)
     self.model.apply(gaussian_weights_init)
@@ -225,6 +330,44 @@ class E_content(nn.Module):
     return outputA, outputB
 
 class E_attr(nn.Module):
+  def __init__(self, input_dim_a, input_dim_b, output_nc=8):
+    super(E_attr, self).__init__()
+    dim = 64
+    self.model_a = nn.Sequential(
+        nn.Conv2d(input_dim_a, dim, 7, 1, 3),
+        nn.ReLU(inplace=True),
+        nn.Conv2d(dim, dim*2, 4, 2, 1),
+        nn.ReLU(inplace=True),
+        nn.Conv2d(dim*2, dim*4, 4, 2, 1),
+        nn.ReLU(inplace=True),
+        nn.Conv2d(dim*4, dim*4, 4, 2, 1),
+        nn.ReLU(inplace=True),
+        nn.Conv2d(dim*4, dim*4, 4, 2, 1),
+        nn.ReLU(inplace=True),
+        nn.AdaptiveAvgPool2d(1),
+        nn.Conv2d(dim*4, output_nc, 1, 1, 0))
+    self.model_b = nn.Sequential(
+        nn.Conv2d(input_dim_a, dim, 7, 1, 3),
+        nn.ReLU(inplace=True),
+        nn.Conv2d(dim, dim*2, 4, 2, 1),
+        nn.ReLU(inplace=True),
+        nn.Conv2d(dim*2, dim*4, 4, 2, 1),
+        nn.ReLU(inplace=True),
+        nn.Conv2d(dim*4, dim*4, 4, 2, 1),
+        nn.ReLU(inplace=True),
+        nn.Conv2d(dim*4, dim*4, 4, 2, 1),
+        nn.ReLU(inplace=True),
+        nn.AdaptiveAvgPool2d(1),
+        nn.Conv2d(dim*4, output_nc, 1, 1, 0))
+    return
+  def forward(self, xa, xb):
+    xa = self.model_a(xa)
+    xb = self.model_b(xb)
+    output_A = xa.view(xa.size(0), -1)
+    output_B = xb.view(xb.size(0), -1)
+    return output_A, output_B
+
+class E_attr_concat(nn.Module):
   def __init__(self, input_dim_a, input_dim_b, output_nc=8, norm_layer=None, nl_layer=None):
     super(E_attr, self).__init__()
 
@@ -237,7 +380,7 @@ class E_attr(nn.Module):
       input_ndf = ndf * min(max_ndf, n)  # 2**(n-1)
       output_ndf = ndf * min(max_ndf, n+1)  # 2**n
       conv_layers_A += [BasicBlock(input_ndf, output_ndf, norm_layer, nl_layer)]
-    conv_layers_A += [nl_layer(), nn.AvgPool2d(13)]
+    conv_layers_A += [nl_layer(), nn.AdaptiveAvgPool2d(1)] # AvgPool2d(13)
     self.fc_A = nn.Sequential(*[nn.Linear(output_ndf, output_nc)])
     self.fcVar_A = nn.Sequential(*[nn.Linear(output_ndf, output_nc)])
     self.conv_A = nn.Sequential(*conv_layers_A)
@@ -247,7 +390,7 @@ class E_attr(nn.Module):
       input_ndf = ndf * min(max_ndf, n)  # 2**(n-1)
       output_ndf = ndf * min(max_ndf, n+1)  # 2**n
       conv_layers_B += [BasicBlock(input_ndf, output_ndf, norm_layer, nl_layer)]
-    conv_layers_B += [nl_layer(), nn.AvgPool2d(13)]
+    conv_layers_B += [nl_layer(), nn.AdaptiveAvgPool2d(1)] # AvgPool2d(13)
     self.fc_B = nn.Sequential(*[nn.Linear(output_ndf, output_nc)])
     self.fcVar_B = nn.Sequential(*[nn.Linear(output_ndf, output_nc)])
     self.conv_B = nn.Sequential(*conv_layers_B)
@@ -261,11 +404,84 @@ class E_attr(nn.Module):
     conv_flat_B = x_conv_B.view(xb.size(0), -1)
     output_B = self.fc_B(conv_flat_B)
     outputVar_B = self.fcVar_B(conv_flat_B)
-
     return output_A, outputVar_A, output_B, outputVar_B
 
-
 class G(nn.Module):
+  def __init__(self, output_dim_a, output_dim_b, nz):
+    super(G, self).__init__()
+    self.nz = nz
+    ini_tch = 256
+    tch_add = ini_tch
+    self.tch_add = tch_add
+    self.decA1 = MisINSResBlock(ini_tch, tch_add)
+    self.decA2 = MisINSResBlock(ini_tch, tch_add)
+    self.decA3 = MisINSResBlock(ini_tch, tch_add)
+    self.decA4 = MisINSResBlock(ini_tch, tch_add)
+    tch = ini_tch
+    decA5 = []
+    decA5 += [ReLUINSConvTranspose2d(tch, tch//2, kernel_size=3, stride=2, padding=1, output_padding=1)]
+    tch = tch//2
+    decA5 += [ReLUINSConvTranspose2d(tch, tch//2, kernel_size=3, stride=2, padding=1, output_padding=1)]
+    tch = tch//2
+    decA5 += [nn.ConvTranspose2d(tch, output_dim_a, kernel_size=1, stride=1, padding=0)]
+    decA5 += [nn.Tanh()]
+    self.decA5 = nn.Sequential(*decA5)
+
+    tch = ini_tch
+    self.decB1 = MisINSResBlock(tch, tch_add)
+    self.decB2 = MisINSResBlock(tch, tch_add)
+    self.decB3 = MisINSResBlock(tch, tch_add)
+    self.decB4 = MisINSResBlock(tch, tch_add)
+    decB5 = []
+    decB5 += [ReLUINSConvTranspose2d(tch, tch//2, kernel_size=3, stride=2, padding=1, output_padding=1)]
+    tch = tch//2
+    decB5 += [ReLUINSConvTranspose2d(tch, tch//2, kernel_size=3, stride=2, padding=1, output_padding=1)]
+    tch = tch//2
+    decB5 += [nn.ConvTranspose2d(tch, output_dim_b, kernel_size=1, stride=1, padding=0)]
+    decB5 += [nn.Tanh()]
+    self.decB5 = nn.Sequential(*decB5)
+
+    self.mlpA = nn.Sequential(
+        nn.Linear(8, 256),
+        nn.ReLU(inplace=True),
+        nn.Linear(256, 256),
+        nn.ReLU(inplace=True),
+        nn.Linear(256, tch_add*4))
+    self.mlpB = nn.Sequential(
+        nn.Linear(8, 256),
+        nn.ReLU(inplace=True),
+        nn.Linear(256, 256),
+        nn.ReLU(inplace=True),
+        nn.Linear(256, tch_add*4))
+    return
+  def forward_a(self, x, z):
+    z = self.mlpA(z)
+    z1, z2, z3, z4 = torch.split(z, self.tch_add, dim=1)
+    z1 = z1.contiguous()
+    z2 = z2.contiguous()
+    z3 = z3.contiguous()
+    z4 = z4.contiguous()
+    out1 = self.decA1(x, z1)
+    out2 = self.decA2(out1, z2)
+    out3 = self.decA3(out2, z3)
+    out4 = self.decA4(out3, z4)
+    out = self.decA5(out4)
+    return out
+  def forward_b(self, x, z):
+    z = self.mlpB(z)
+    z1, z2, z3, z4 = torch.split(z, self.tch_add, dim=1)
+    z1 = z1.contiguous()
+    z2 = z2.contiguous()
+    z3 = z3.contiguous()
+    z4 = z4.contiguous()
+    out1 = self.decB1(x, z1)
+    out2 = self.decB2(out1, z2)
+    out3 = self.decB3(out2, z3)
+    out4 = self.decB4(out3, z4)
+    out = self.decB5(out4)
+    return out
+
+class G_concat(nn.Module):
   def __init__(self, output_dim_a, output_dim_b, nz):
     super(G, self).__init__()
     self.nz = nz

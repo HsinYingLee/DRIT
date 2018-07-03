@@ -1,8 +1,8 @@
 import torch
 from torch.autograd import Variable
-from options.train_options import TrainOptions
-from dataset_unpair import dataset_unpair
-from model import DRIT
+from options import TrainOptions
+from dataset import dataset_unpair
+from model import DRIT, DRIT_concat
 from saver import Saver
 
 def main():
@@ -17,13 +17,17 @@ def main():
 
   # model
   print('\n--- load model ---')
-  model = DRIT(opts)
+  if opts.concat:
+    model = DRIT_concat(opts)
+  else:
+    model = DRIT(opts)
+  model.setgpu(opts.gpu)
   if opts.resume is None:
     model.initialize()
     ep0 = -1
+    total_it = 0
   else:
-    ep0 = model.resume(opts.resume)
-  model.setgpu(opts.gpu)
+    ep0, total_it = model.resume(opts.resume)
   model.set_scheduler(opts, last_ep=ep0)
   ep0 += 1
   print('start the training at epoch %d'%(ep0))
@@ -34,7 +38,6 @@ def main():
   # train
   print('\n--- train ---')
   max_it = 500000
-  total_it = 0
   for ep in range(ep0, opts.n_ep):
     for it, (images_a, images_b) in enumerate(train_loader):
       if images_a.size(0) != opts.batch_size or images_b.size(0) != opts.batch_size:
@@ -70,7 +73,7 @@ def main():
     saver.write_img(ep, model)
 
     # Save network weights
-    saver.write_model(ep, model)
+    saver.write_model(ep, total_it, model)
 
   return
 

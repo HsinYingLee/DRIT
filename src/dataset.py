@@ -4,6 +4,38 @@ from PIL import Image
 from torchvision.transforms import Compose, Resize, RandomCrop, CenterCrop, RandomHorizontalFlip, ToTensor, Normalize
 import random
 
+class dataset_single(data.Dataset):
+  def __init__(self, opts, setname, input_dim):
+    self.dataroot = opts.dataroot
+    images = os.listdir(os.path.join(self.dataroot, opts.phase + setname))
+    self.img = [os.path.join(self.dataroot, opts.phase + setname, x) for x in images]
+    self.size = len(self.img)
+    self.input_dim = input_dim
+
+    # setup image transformation
+    transforms = [Resize(opts.resize_size, Image.BICUBIC)]
+    transforms.append(CenterCrop(opts.crop_size))
+    transforms.append(ToTensor())
+    transforms.append(Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]))
+    self.transforms = Compose(transforms)
+    print('%d images'%(self.size))
+    return
+
+  def __getitem__(self, index):
+    data = self.load_img(self.img[index], self.input_dim)
+    return data
+
+  def load_img(self, img_name, input_dim):
+    img = Image.open(img_name).convert('RGB')
+    img = self.transforms(img)
+    if input_dim == 1:
+      img = img[0, ...] * 0.299 + img[1, ...] * 0.587 + img[2, ...] * 0.114
+      img = img.unsqueeze(0)
+    return img
+
+  def __len__(self):
+    return self.size
+
 class dataset_unpair(data.Dataset):
   def __init__(self, opts):
     self.dataroot = opts.dataroot
@@ -26,6 +58,7 @@ class dataset_unpair(data.Dataset):
     transforms = [Resize(opts.resize_size, Image.BICUBIC)]
     if opts.phase == 'train':
       transforms.append(RandomCrop(opts.crop_size))
+      #transforms.append(CenterCrop(opts.crop_size))
     else:
       transforms.append(CenterCrop(opts.crop_size))
     if not opts.no_flip:

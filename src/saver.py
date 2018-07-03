@@ -1,8 +1,23 @@
 import os
 import torchvision
-import tensorboard
-from tensorboard import summary
+from tensorboardX import SummaryWriter
 import numpy as np
+from PIL import Image
+
+def tensor2img(img):
+  img = img[0].cpu().float().numpy()
+  if img.shape[0] == 1:
+    img = np.tile(img, (3, 1, 1))
+  img = (np.transpose(img, (1, 2, 0)) + 1) / 2.0 * 255.0
+  return img.astype(np.uint8)
+
+def save_imgs(imgs, names, path):
+  if not os.path.exists(path):
+    os.mkdir(path)
+  for img, name in zip(imgs, names):
+    img = tensor2img(img)
+    img = Image.fromarray(img)
+    img.save(os.path.join(path, name + '.png'))
 
 class Saver():
   def __init__(self, opts):
@@ -20,19 +35,19 @@ class Saver():
     if not os.path.exists(self.image_dir):
       os.makedirs(self.image_dir)
 
-    self.train_writer = tensorboard.FileWriter("%s" % (self.display_dir))
+    self.writer = SummaryWriter(log_dir=self.display_dir)
 
   def write_display(self, total_it, model):
     if (total_it + 1) % self.display_freq == 0:
       # write loss
       members = [attr for attr in dir(model) if not callable(getattr(model, attr)) and not attr.startswith("__") and 'loss' in attr]
       for m in members:
-        self.train_writer.add_summary(summary.scalar(m, getattr(model, m)), total_it)
+        self.writer.add_scalar(m, getattr(model, m), total_it)
       # write img
       image_dis = torchvision.utils.make_grid(model.image_display, nrow=model.image_display.size(0)/2, normalize=True, scale_each=True)
       image_dis = np.transpose(image_dis.numpy(), (1, 2, 0)) * 255
       image_dis = image_dis.astype('uint8')
-      self.train_writer.add_summary(summary.image('Image', image_dis), total_it)
+      self.writer.add_image('Image', image_dis, total_it)
 
   def write_img(self, ep, model):
     if (ep + 1) % self.img_save_freq == 0:
@@ -44,10 +59,10 @@ class Saver():
       img_filename = '%s/gen_last.jpg' % (self.image_dir, ep)
       torchvision.utils.save_image(assembled_images.data / 2 + 0.5, img_filename, nrow=1)
 
-  def write_model(self, ep, model):
+  def write_model(self, ep, total_it, model):
     if (ep + 1) % self.model_save_freq == 0:
       print('--- save the model @ ep %d ---' % (ep))
-      model.save('%s/%08d.pkl' % (self.model_dir, ep), ep)
+      model.save('%s/%08d.pkl' % (self.model_dir, ep), ep, total_it)
     elif ep == -41608:
-      model.save('%s/last.pkl' % self.model_dir, ep)
+      model.save('%s/last.pkl' % self.model_dir, ep, total_it)
 
