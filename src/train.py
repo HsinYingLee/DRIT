@@ -2,7 +2,7 @@ import torch
 from torch.autograd import Variable
 from options import TrainOptions
 from dataset import dataset_unpair
-from model import DRIT, DRIT_concat
+from model import DRIT
 from saver import Saver
 
 def main():
@@ -17,10 +17,7 @@ def main():
 
   # model
   print('\n--- load model ---')
-  if opts.concat:
-    model = DRIT_concat(opts)
-  else:
-    model = DRIT(opts)
+  model = DRIT(opts)
   model.setgpu(opts.gpu)
   if opts.resume is None:
     model.initialize()

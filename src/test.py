@@ -1,7 +1,7 @@
 import torch
 from options import TestOptions
 from dataset import dataset_single
-from model import DRIT, DRIT_concat
+from model import DRIT
 from saver import save_imgs
 import os
 
@@ -23,10 +23,7 @@ def main():
 
   # model
   print('\n--- load model ---')
-  if opts.concat:
-    model = DRIT_concat(opts)
-  else:
-    model = DRIT(opts)
+  model = DRIT(opts)
   model.setgpu(opts.gpu)
   model.resume(opts.resume)
   model.eval()
