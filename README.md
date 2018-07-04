@@ -14,7 +14,7 @@ European Conference on Computer Vision (ECCV), 2018 (* indicates equal contribut
 
 Please cite our paper if you find it useful for your research.
 ```
-@inproceedings{Lee_drit_2018,
+@inproceedings{lee_drit_2018,
   author = {H.-Y. Lee and H.-Y. Tseng and M. Kumar and J.-B. Huang and M.-H. Yang},
   booktitle = {European Conference on Computer Vision (ECCV)},
   title = {Diverse Image-to-Image Translation via Disentangled Representations},
@@ -62,4 +62,4 @@ Results and saved models can be found at `../results/cat2dog`.
 ```
 python3 test.py --dataroot ../datasets/yosemite --a2b 1 --random_z 1 --name yosemite --concat 1 --resume ../models/example.pth
 ```
-Results can be found at `../outputs/cat2dog`.
+Results can be found at `../outputs/yosemite`.
