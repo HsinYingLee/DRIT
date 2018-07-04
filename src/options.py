@@ -53,7 +53,7 @@ class TestOptions():
     self.parser.add_argument('--input_dim_a', type=int, default=3, help='# of input channels for domain A')
     self.parser.add_argument('--input_dim_b', type=int, default=3, help='# of input channels for domain B')
     self.parser.add_argument('--a2b', type=int, default=1, help='translation direction')
-    self.parser.add_argument('--random_z', type=int, default=0, help='use random attr or encoded   attr')
+    self.parser.add_argument('--random_z', type=int, default=1, help='use random attr or encoded   attr')
 
     # ouptput related
     self.parser.add_argument('--num', type=int, default=5, help='number of outputs per image')
