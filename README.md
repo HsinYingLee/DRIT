@@ -13,14 +13,14 @@ Diverse Image-to-Image Translation via Disentangled Representations:<br>
 European Conference on Computer Vision (ECCV), 2018 (* indicates equal contribution)
 
 Please cite our paper if you find it useful for your research.
-'''
+```
 @inproceedings{Lee_drit_2018,
   author = {H.-Y. Lee and H.-Y. Tseng and M. Kumar and J.-B. Huang and M.-H. Yang},
   booktitle = {European Conference on Computer Vision (ECCV)},
   title = {Diverse Image-to-Image Translation via Disentangled Representations},
   year = {2018}
 }
-'''
+```
 
 ## Example Results
 
@@ -34,32 +34,32 @@ Please cite our paper if you find it useful for your research.
 
 ### Install
 - Clone this repo:
-'''
+```
 git clone ...
 cd DRIT/src
-'''
+```
 
 ## Dataset
 
 ## Training Examples
 - Yosemite summer <-> winter translation
-'''
+```
 python3 train.py --dataroot ../datasets/yosemite --concat 1 --name yosemite
 tensorboard --logdir ../logs yosemite
-'''
+```
 Results and saved models can be found at `../results/yosemite`.
 
 - cats <-> dogs translation
-'''
+```
 python3 train.py --dataroot ../datasets/yosemite --name cat2dog
 tensorboard --logdir ../logs cat2dog
-'''
+```
 Results and saved models can be found at `../results/cat2dog`.
 
 ## Testing Example
 - Download a pre-trained model
 - Generate results in domain B from domain A
-'''
+```
 python3 test.py --dataroot ../datasets/yosemite --a2b 1 --random_z 1 --name yosemite --concat 1 --resume ../models/example.pth
-'''
+```
 Results can be found at `../outputs/cat2dog`.
