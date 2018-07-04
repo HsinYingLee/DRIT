@@ -8,7 +8,7 @@ class TrainOptions():
     self.parser.add_argument('--dataroot', type=str, required=True, help='path of training data list, should contain data lists for both domains')
     self.parser.add_argument('--phase', type=str, default='train', help='phase for dataloading')
     self.parser.add_argument('--batch_size', type=int, default=2, help='batch size')
-    self.parser.add_argument('--resize_size', type=int, default=240, help='resized image size for training')
+    self.parser.add_argument('--resize_size', type=int, default=256, help='resized image size for training')
     self.parser.add_argument('--crop_size', type=int, default=216, help='cropped image size for training')
     self.parser.add_argument('--input_dim_a', type=int, default=3, help='# of input channels for domain A')
     self.parser.add_argument('--input_dim_b', type=int, default=3, help='# of input channels for domain B')
