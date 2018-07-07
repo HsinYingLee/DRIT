@@ -15,10 +15,14 @@ class DRIT(nn.Module):
     self.concat = opts.concat
 
     # discriminators
-    self.disA = networks.Dis(opts.input_dim_a)
-    self.disB = networks.Dis(opts.input_dim_b)
-    self.disA2 = networks.Dis(opts.input_dim_a)
-    self.disB2 = networks.Dis(opts.input_dim_b)
+    #self.disA = networks.Dis(opts.input_dim_a)
+    #self.disB = networks.Dis(opts.input_dim_b)
+    #self.disA2 = networks.Dis(opts.input_dim_a)
+    #self.disB2 = networks.Dis(opts.input_dim_b)
+    self.disA = networks.MultiScaleDis(opts.input_dim_a)
+    self.disB = networks.MultiScaleDis(opts.input_dim_b)
+    self.disA2 = networks.MultiScaleDis(opts.input_dim_a)
+    self.disB2 = networks.MultiScaleDis(opts.input_dim_b)
     self.disContent = networks.Dis_content()
 
     # encoders
@@ -236,27 +240,28 @@ class DRIT(nn.Module):
   def backward_D(self, netD, real, fake):
     pred_fake = netD.forward(fake.detach())
     pred_real = netD.forward(real)
-    #for it, (out_a, out_b) in enumerate(itertools.izip(pred_fake, pred_real)):
+    loss_D = 0
     for it, (out_a, out_b) in enumerate(zip(pred_fake, pred_real)):
       out_fake = nn.functional.sigmoid(out_a)
       out_real = nn.functional.sigmoid(out_b)
-      all1 = Variable(torch.ones((out_real.size(0))).cuda(self.gpu))
-      all0 = Variable(torch.zeros((out_fake.size(0))).cuda(self.gpu))
-      ad_true_loss = nn.functional.binary_cross_entropy(out_real, all1)
+      all0 = torch.zeros_like(out_fake).cuda(self.gpu)
+      all1 = torch.ones_like(out_real).cuda(self.gpu)
+      #all1 = torch.ones((out_real.size(0))).cuda(self.gpu)
+      #all0 = torch.zeros((out_fake.size(0))).cuda(self.gpu)
       ad_fake_loss = nn.functional.binary_cross_entropy(out_fake, all0)
-    loss_D = ad_true_loss + ad_fake_loss
+      ad_true_loss = nn.functional.binary_cross_entropy(out_real, all1)
+      loss_D += ad_true_loss + ad_fake_loss
     loss_D.backward()
     return loss_D
 
   def backward_contentD(self, imageA, imageB):
     pred_fake = self.disContent.forward(imageA.detach())
     pred_real = self.disContent.forward(imageB.detach())
-    #for it, (out_a, out_b) in enumerate(itertools.izip(pred_fake, pred_real)):
     for it, (out_a, out_b) in enumerate(zip(pred_fake, pred_real)):
       out_fake = nn.functional.sigmoid(out_a)
       out_real = nn.functional.sigmoid(out_b)
-      all1 = Variable(torch.ones((out_real.size(0))).cuda(self.gpu))
-      all0 = Variable(torch.zeros((out_fake.size(0))).cuda(self.gpu))
+      all1 = torch.ones((out_real.size(0))).cuda(self.gpu)
+      all0 = torch.zeros((out_fake.size(0))).cuda(self.gpu)
       ad_true_loss = nn.functional.binary_cross_entropy(out_real, all1)
       ad_fake_loss = nn.functional.binary_cross_entropy(out_fake, all0)
     loss_D = ad_true_loss + ad_fake_loss
@@ -344,7 +349,8 @@ class DRIT(nn.Module):
     outs_fake = netD.forward(fake)
     for out_a in outs_fake:
       outputs_fake = nn.functional.sigmoid(out_a)
-      all_ones = Variable(torch.ones((outputs_fake.size(0))).cuda(self.gpu))
+      all_ones = torch.ones_like(outputs_fake).cuda(self.gpu)
+      #all_ones = Variable(torch.ones((outputs_fake.size(0))).cuda(self.gpu))
       ad_loss_a = nn.functional.binary_cross_entropy(outputs_fake, all_ones)
     return ad_loss_a
 

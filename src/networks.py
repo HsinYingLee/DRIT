@@ -350,6 +350,32 @@ class Dis_content(nn.Module):
     outs.append(out)
     return outs
 
+class MultiScaleDis(nn.Module):
+  def __init__(self, input_dim, n_scale=3, n_layer=4):
+    super(MultiScaleDis, self).__init__()
+    ch = 64
+    self.downsample = nn.AvgPool2d(3, stride=2, padding=1, count_include_pad=False)
+    self.Diss = nn.ModuleList()
+    for _ in range(n_scale):
+      self.Diss.append(self._make_net(ch, input_dim, n_layer))
+
+  def _make_net(self, ch, input_dim, n_layer):
+    model = []
+    model += [Spectral_LeakyReLUConv2d(input_dim, ch, 3, 2, 1)]
+    tch = ch
+    for _ in range(1, n_layer):
+      model += [Spectral_LeakyReLUConv2d(tch, tch * 2, 3, 2, 1)]
+      tch *= 2
+    model += [spectral_norm(nn.Conv2d(tch, 1, 1, 1, 0))]
+    return nn.Sequential(*model)
+
+  def forward(self, x):
+    outs = []
+    for Dis in self.Diss:
+      outs.append(Dis(x))
+      x = self.downsample(x)
+    return outs
+
 class Dis(nn.Module):
   def __init__(self, input_dim):
     super(Dis, self).__init__()
