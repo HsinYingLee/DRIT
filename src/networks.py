@@ -5,6 +5,80 @@ import functools
 from torch.optim import lr_scheduler
 import torch.nn.functional as F
 
+# -------- spectral normalization ----------
+class SpectralNorm(object):
+  def __init__(self, name='weight', n_power_iterations=1, dim=0, eps=1e-12):
+    self.name = name
+    self.dim = dim
+    if n_power_iterations <= 0:
+      raise ValueError('Expected n_power_iterations to be positive, but '
+                       'got n_power_iterations={}'.format(n_power_iterations))
+    self.n_power_iterations = n_power_iterations
+    self.eps = eps
+  def compute_weight(self, module):
+    weight = getattr(module, self.name + '_orig')
+    u = getattr(module, self.name + '_u')
+    weight_mat = weight
+    if self.dim != 0:
+      # permute dim to front
+      weight_mat = weight_mat.permute(self.dim,
+                                            *[d for d in range(weight_mat.dim()) if d != self.dim])
+    height = weight_mat.size(0)
+    weight_mat = weight_mat.reshape(height, -1)
+    with torch.no_grad():
+      for _ in range(self.n_power_iterations):
+        v = F.normalize(torch.matmul(weight_mat.t(), u), dim=0, eps=self.eps)
+        u = F.normalize(torch.matmul(weight_mat, v), dim=0, eps=self.eps)
+    sigma = torch.dot(u, torch.matmul(weight_mat, v))
+    weight = weight / sigma
+    return weight, u
+  def remove(self, module):
+    weight = getattr(module, self.name)
+    delattr(module, self.name)
+    delattr(module, self.name + '_u')
+    delattr(module, self.name + '_orig')
+    module.register_parameter(self.name, torch.nn.Parameter(weight))
+  def __call__(self, module, inputs):
+    if module.training:
+      weight, u = self.compute_weight(module)
+      setattr(module, self.name, weight)
+      setattr(module, self.name + '_u', u)
+    else:
+      r_g = getattr(module, self.name + '_orig').requires_grad
+      getattr(module, self.name).detach_().requires_grad_(r_g)
+
+  @staticmethod
+  def apply(module, name, n_power_iterations, dim, eps):
+    fn = SpectralNorm(name, n_power_iterations, dim, eps)
+    weight = module._parameters[name]
+    height = weight.size(dim)
+    u = F.normalize(weight.new_empty(height).normal_(0, 1), dim=0, eps=fn.eps)
+    delattr(module, fn.name)
+    module.register_parameter(fn.name + "_orig", weight)
+    module.register_buffer(fn.name, weight.data)
+    module.register_buffer(fn.name + "_u", u)
+    module.register_forward_pre_hook(fn)
+    return fn
+
+def spectral_norm(module, name='weight', n_power_iterations=1, eps=1e-12, dim=None):
+  if dim is None:
+    if isinstance(module, (torch.nn.ConvTranspose1d,
+                           torch.nn.ConvTranspose2d,
+                           torch.nn.ConvTranspose3d)):
+      dim = 1
+    else:
+      dim = 0
+  SpectralNorm.apply(module, name, n_power_iterations, dim, eps)
+  return module
+
+def remove_spectral_norm(module, name='weight'):
+  for k, hook in module._forward_pre_hooks.items():
+    if isinstance(hook, SpectralNorm) and hook.name == name:
+      hook.remove(module)
+      del module._forward_pre_hooks[k]
+      return module
+  raise ValueError("spectral_norm of '{}' not found in {}".format(name, module))
+
 # --------------- functions ------------------
 def get_scheduler(optimizer, opts, cur_ep=-1):
   if opts.lr_policy == 'lambda':
@@ -119,6 +193,17 @@ class BasicBlock(nn.Module):
   def forward(self, x):
     out = self.conv(x) + self.shortcut(x)
     return out
+
+class Spectral_LeakyReLUConv2d(nn.Module):
+  def __init__(self, n_in, n_out, kernel_size, stride, padding=0):
+    super(Spectral_LeakyReLUConv2d, self).__init__()
+    model = []
+    model += [spectral_norm(nn.Conv2d(n_in, n_out, kernel_size=kernel_size, stride=stride, padding=padding, bias=True))]
+    model += [nn.LeakyReLU(inplace=True)]
+    self.model = nn.Sequential(*model)
+    self.model.apply(gaussian_weights_init)
+  def forward(self, x):
+    return self.model(x)
 
 class LeakyReLUConv2d(nn.Module):
   def __init__(self, n_in, n_out, kernel_size, stride, padding=0):
@@ -274,12 +359,12 @@ class Dis(nn.Module):
 
   def _make_net(self, ch, input_dim, n_layer):
     model = []
-    model += [LeakyReLUConv2d(input_dim, ch, kernel_size=3, stride=2, padding=1)] #16
+    model += [Spectral_LeakyReLUConv2d(input_dim, ch, kernel_size=3, stride=2, padding=1)] #16
     tch = ch
     for i in range(1, n_layer):
-      model += [LeakyReLUConv2d(tch, tch * 2, kernel_size=3, stride=2, padding=1)] # 8
+      model += [Spectral_LeakyReLUConv2d(tch, tch * 2, kernel_size=3, stride=2, padding=1)] # 8
       tch *= 2
-    model += [nn.Conv2d(tch, 1, kernel_size=1, stride=1, padding=0)]  # 1
+    model += [spectral_norm(nn.Conv2d(tch, 1, kernel_size=1, stride=1, padding=0))]  # 1
     return nn.Sequential(*model)
 
   def cuda(self,gpu):
@@ -369,7 +454,7 @@ class E_attr(nn.Module):
 
 class E_attr_concat(nn.Module):
   def __init__(self, input_dim_a, input_dim_b, output_nc=8, norm_layer=None, nl_layer=None):
-    super(E_attr, self).__init__()
+    super(E_attr_concat, self).__init__()
 
     ndf = 64
     n_blocks=4
@@ -483,7 +568,7 @@ class G(nn.Module):
 
 class G_concat(nn.Module):
   def __init__(self, output_dim_a, output_dim_b, nz):
-    super(G, self).__init__()
+    super(G_concat, self).__init__()
     self.nz = nz
     tch = 256
     dec_share = []

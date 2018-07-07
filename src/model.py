@@ -2,7 +2,7 @@ import networks
 import torch
 from torch.autograd import Variable
 import torch.nn as nn
-import itertools
+#import itertools
 import numpy as np
 
 class DRIT(nn.Module):
@@ -31,7 +31,7 @@ class DRIT(nn.Module):
 
     # generator
     if self.concat:
-      self.gen = networks.G_concat(opts.inpu_dim_a, opts.input_dim_b, nz=self.nz)
+      self.gen = networks.G_concat(opts.input_dim_a, opts.input_dim_b, nz=self.nz)
     else:
       self.gen = networks.G(opts.input_dim_a, opts.input_dim_b, nz=self.nz)
 
@@ -236,7 +236,8 @@ class DRIT(nn.Module):
   def backward_D(self, netD, real, fake):
     pred_fake = netD.forward(fake.detach())
     pred_real = netD.forward(real)
-    for it, (out_a, out_b) in enumerate(itertools.izip(pred_fake, pred_real)):
+    #for it, (out_a, out_b) in enumerate(itertools.izip(pred_fake, pred_real)):
+    for it, (out_a, out_b) in enumerate(zip(pred_fake, pred_real)):
       out_fake = nn.functional.sigmoid(out_a)
       out_real = nn.functional.sigmoid(out_b)
       all1 = Variable(torch.ones((out_real.size(0))).cuda(self.gpu))
@@ -250,7 +251,8 @@ class DRIT(nn.Module):
   def backward_contentD(self, imageA, imageB):
     pred_fake = self.disContent.forward(imageA.detach())
     pred_real = self.disContent.forward(imageB.detach())
-    for it, (out_a, out_b) in enumerate(itertools.izip(pred_fake, pred_real)):
+    #for it, (out_a, out_b) in enumerate(itertools.izip(pred_fake, pred_real)):
+    for it, (out_a, out_b) in enumerate(zip(pred_fake, pred_real)):
       out_fake = nn.functional.sigmoid(out_a)
       out_real = nn.functional.sigmoid(out_b)
       all1 = Variable(torch.ones((out_real.size(0))).cuda(self.gpu))

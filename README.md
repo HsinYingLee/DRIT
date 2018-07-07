@@ -1,3 +1,5 @@
+![Python 3.6](https://img.shields.io/badge/python-3.6-green.svg)
+
 gif file
 
 # Diverse Image-to-Image Translation via Disentangled Representations
@@ -10,7 +12,7 @@ Contact: Hsin-Ying Lee (hlee246@ucmerced.edu) and Hung-Yu Tseng (htseng6@ucmerce
 ## Paper
 Diverse Image-to-Image Translation via Disentangled Representations<br>
 [Hsin-Ying Lee](http://vllab.ucmerced.edu/hylee/)\*, [Hung-Yu Tseng](https://sites.google.com/site/hytseng0509/)\*, [Maneesh Kumar Singh](https://scholar.google.com/citations?user=hdQhiFgAAAAJ), [Jia-Bin Huang](https://filebox.ece.vt.edu/~jbhuang/), and [Ming-Hsuan Yang](http://faculty.ucmerced.edu/mhyang/)<br>
-European Conference on Computer Vision (ECCV), 2018 (* indicates equal contribution)
+European Conference on Computer Vision (ECCV), 2018 (**oral**) (* indicates equal contribution)
 
 Please cite our paper if you find it useful for your research.
 ```
@@ -23,11 +25,12 @@ Please cite our paper if you find it useful for your research.
 ```
 
 ## Example Results
-tease image
+teaser image
 
 ## Usage
 
 ### Prerequisites
+- Python 3.6
 - Pytorch 4.0 and torchvision (https://pytorch.org/)
 - [TensorboardX](https://github.com/lanpa/tensorboard-pytorch)
 - [Tensorflow](https://www.tensorflow.org/) (for tensorboard usage)
