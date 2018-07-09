@@ -347,12 +347,13 @@ class DRIT(nn.Module):
 
   def backward_G_GAN(self, fake, netD=None):
     outs_fake = netD.forward(fake)
+    loss_G = 0
     for out_a in outs_fake:
       outputs_fake = nn.functional.sigmoid(out_a)
       all_ones = torch.ones_like(outputs_fake).cuda(self.gpu)
       #all_ones = Variable(torch.ones((outputs_fake.size(0))).cuda(self.gpu))
-      ad_loss_a = nn.functional.binary_cross_entropy(outputs_fake, all_ones)
-    return ad_loss_a
+      loss_G += nn.functional.binary_cross_entropy(outputs_fake, all_ones)
+    return loss_G
 
   def backward_G_alone(self):
     # Ladv for generator

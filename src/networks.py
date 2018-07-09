@@ -361,12 +361,12 @@ class MultiScaleDis(nn.Module):
 
   def _make_net(self, ch, input_dim, n_layer):
     model = []
-    model += [Spectral_LeakyReLUConv2d(input_dim, ch, 3, 2, 1)]
+    model += [LeakyReLUConv2d(input_dim, ch, 4, 2, 1)]
     tch = ch
     for _ in range(1, n_layer):
-      model += [Spectral_LeakyReLUConv2d(tch, tch * 2, 3, 2, 1)]
+      model += [LeakyReLUConv2d(tch, tch * 2, 4, 2, 1)]
       tch *= 2
-    model += [spectral_norm(nn.Conv2d(tch, 1, 1, 1, 0))]
+    model += [nn.Conv2d(tch, 1, 1, 1, 0)]
     return nn.Sequential(*model)
 
   def forward(self, x):
