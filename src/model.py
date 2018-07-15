@@ -15,10 +15,10 @@ class DRIT(nn.Module):
     self.concat = opts.concat
 
     # discriminators
-    #self.disA = networks.Dis(opts.input_dim_a)
-    #self.disB = networks.Dis(opts.input_dim_b)
-    #self.disA2 = networks.Dis(opts.input_dim_a)
-    #self.disB2 = networks.Dis(opts.input_dim_b)
+    '''self.disA = networks.Dis(opts.input_dim_a)
+    self.disB = networks.Dis(opts.input_dim_b)
+    self.disA2 = networks.Dis(opts.input_dim_a)
+    self.disB2 = networks.Dis(opts.input_dim_b)'''
     self.disA = networks.MultiScaleDis(opts.input_dim_a)
     self.disB = networks.MultiScaleDis(opts.input_dim_b)
     self.disA2 = networks.MultiScaleDis(opts.input_dim_a)

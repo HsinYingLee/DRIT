@@ -210,6 +210,7 @@ class LeakyReLUConv2d(nn.Module):
     super(LeakyReLUConv2d, self).__init__()
     model = []
     model += [nn.Conv2d(n_in, n_out, kernel_size=kernel_size, stride=stride, padding=padding, bias=True)]
+    model += [nn.InstanceNorm2d(n_out, affine=False)]
     model += [nn.LeakyReLU(inplace=True)]
     self.model = nn.Sequential(*model)
     self.model.apply(gaussian_weights_init)
