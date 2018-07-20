@@ -210,6 +210,17 @@ class LeakyReLUConv2d(nn.Module):
     super(LeakyReLUConv2d, self).__init__()
     model = []
     model += [nn.Conv2d(n_in, n_out, kernel_size=kernel_size, stride=stride, padding=padding, bias=True)]
+    model += [nn.LeakyReLU(inplace=True)]
+    self.model = nn.Sequential(*model)
+    self.model.apply(gaussian_weights_init)
+  def forward(self, x):
+    return self.model(x)
+
+class LeakyReLUINSConv2d(nn.Module):
+  def __init__(self, n_in, n_out, kernel_size, stride, padding=0):
+    super(LeakyReLUINSConv2d, self).__init__()
+    model = []
+    model += [nn.Conv2d(n_in, n_out, kernel_size=kernel_size, stride=stride, padding=padding, bias=True)]
     model += [nn.InstanceNorm2d(n_out, affine=False)]
     model += [nn.LeakyReLU(inplace=True)]
     self.model = nn.Sequential(*model)
@@ -338,9 +349,9 @@ class Dis_content(nn.Module):
   def __init__(self):
     super(Dis_content, self).__init__()
     model = []
-    model += [LeakyReLUConv2d(256, 256, kernel_size=7, stride=2, padding=1)]
-    model += [LeakyReLUConv2d(256, 256, kernel_size=7, stride=2, padding=1)]
-    model += [LeakyReLUConv2d(256, 256, kernel_size=7, stride=2, padding=1)]
+    model += [LeakyReLUINSConv2d(256, 256, kernel_size=7, stride=2, padding=1)]
+    model += [LeakyReLUINSConv2d(256, 256, kernel_size=7, stride=2, padding=1)]
+    model += [LeakyReLUINSConv2d(256, 256, kernel_size=7, stride=2, padding=1)]
     model += [LeakyReLUConv2d(256, 256, kernel_size=4, stride=1, padding=0)]
     model += [nn.Conv2d(256, 1, kernel_size=1, stride=1, padding=0)]
     self.model = nn.Sequential(*model)
@@ -362,10 +373,12 @@ class MultiScaleDis(nn.Module):
 
   def _make_net(self, ch, input_dim, n_layer):
     model = []
-    model += [LeakyReLUConv2d(input_dim, ch, 4, 2, 1)]
+    model += [LeakyReLUINSConv2d(input_dim, ch, 4, 2, 1)]
+    #model += [LeakyReLUConv2d(input_dim, ch, 4, 2, 1)]
     tch = ch
     for _ in range(1, n_layer):
-      model += [LeakyReLUConv2d(tch, tch * 2, 4, 2, 1)]
+      model += [LeakyReLUINSConv2d(tch, tch * 2, 4, 2, 1)]
+      #model += [LeakyReLUConv2d(tch, tch * 2, 4, 2, 1)]
       tch *= 2
     model += [nn.Conv2d(tch, 1, 1, 1, 0)]
     return nn.Sequential(*model)
@@ -386,12 +399,17 @@ class Dis(nn.Module):
 
   def _make_net(self, ch, input_dim, n_layer):
     model = []
-    model += [Spectral_LeakyReLUConv2d(input_dim, ch, kernel_size=3, stride=2, padding=1)] #16
+    model += [LeakyReLUINSConv2d(input_dim, ch, kernel_size=3, stride=2, padding=1)] #16
+    #model += [Spectral_LeakyReLUConv2d(input_dim, ch, kernel_size=3, stride=2, padding=1)] #16
     tch = ch
-    for i in range(1, n_layer):
-      model += [Spectral_LeakyReLUConv2d(tch, tch * 2, kernel_size=3, stride=2, padding=1)] # 8
+    for i in range(1, n_layer-1):
+      model += [LeakyReLUINSConv2d(tch, tch * 2, kernel_size=3, stride=2, padding=1)] # 8
+      #model += [Spectral_LeakyReLUConv2d(tch, tch * 2, kernel_size=3, stride=2, padding=1)] # 8
       tch *= 2
-    model += [spectral_norm(nn.Conv2d(tch, 1, kernel_size=1, stride=1, padding=0))]  # 1
+    model += [LeakyReLUConv2d(tch, tch * 2, kernel_size=3, stride=2, padding=1)] # 1
+    tch *= 2
+    model += [nn.Conv2d(tch, 1, kernel_size=1, stride=1, padding=0)]  # 1
+    #model += [spectral_norm(nn.Conv2d(tch, 1, kernel_size=1, stride=1, padding=0))]  # 1
     return nn.Sequential(*model)
 
   def cuda(self,gpu):
