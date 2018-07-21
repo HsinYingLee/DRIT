@@ -92,7 +92,7 @@ class DRIT(nn.Module):
     self.z_content_a, self.z_content_b = self.enc_c.forward(image_a, image_b)
     if random_z:
       self.z_random = self.get_z_random(image_a.size(0), self.nz, 'gauss')
-      #np.save('gg/{}'.format(idx), self.z_random.cpu().numpy())
+      #np.save('/home/ym41608/z/{}'.format(idx), self.z_random.cpu().numpy())
       if a2b:
         image = self.gen.forward_b(self.z_content_a, self.z_random)
       else:

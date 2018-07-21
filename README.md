@@ -1,6 +1,6 @@
 ![Python 3.6](https://img.shields.io/badge/python-3.6-green.svg)
 
-gif file
+<img src='imgs/emma2portrait.gif' align="right" width=384>
 
 # Diverse Image-to-Image Translation via Disentangled Representations
 [[Project Page]]()[[Paper]]()
@@ -17,7 +17,7 @@ European Conference on Computer Vision (ECCV), 2018 (**oral**) (* equal contribu
 Please cite our paper if you find it useful for your research.
 ```
 @inproceedings{lee_drit_2018,
-  author = {Lee, Hsin-Ying. and Tseng, Hung-Yu. and Singh, Maneesh Kumar and Huang, Jia-Bin and Yang, Ming-Hsuan},
+  author = {Lee, Hsin-Ying. and Tseng, Hung-Yu and Singh, Maneesh Kumar and Huang, Jia-Bin and Yang, Ming-Hsuan},
   booktitle = {European Conference on Computer Vision (ECCV)},
   title = {Diverse Image-to-Image Translation via Disentangled Representations},
   year = {2018}
@@ -25,7 +25,7 @@ Please cite our paper if you find it useful for your research.
 ```
 
 ## Example Results
-teaser image
+<img src='imgs/teaser.png' width="1000px"/>
 
 ## Usage
 
@@ -39,7 +39,7 @@ teaser image
 ### Install
 - Clone this repo:
 ```
-git clone https://github.com/HsinYingLee/OPN.git
+git clone https://github.com/HsinYingLee/DRIT.git
 cd DRIT/src
 ```
 

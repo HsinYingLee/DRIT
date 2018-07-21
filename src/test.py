@@ -52,6 +52,7 @@ def main():
       imgs.append(img)
       names.append('output_{}'.format(idx2))
     save_imgs(imgs, names, os.path.join(result_dir, '{}'.format(idx1)))
+    input()
 
   return
 
