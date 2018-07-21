@@ -68,4 +68,3 @@ RUN pip3 install torchvision
 ## other packages
 RUN pip3 install tensorboardX
 RUN pip3 install tensorflow
-RUN pip3 install tensorflow-gpu

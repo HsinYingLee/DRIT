@@ -11,13 +11,13 @@ Contact: Hsin-Ying Lee (hlee246@ucmerced.edu) and Hung-Yu Tseng (htseng6@ucmerce
 
 ## Paper
 Diverse Image-to-Image Translation via Disentangled Representations<br>
-[Hsin-Ying Lee](http://vllab.ucmerced.edu/hylee/)\*, [Hung-Yu Tseng](https://sites.google.com/site/hytseng0509/)\*, [Maneesh Kumar Singh](https://scholar.google.com/citations?user=hdQhiFgAAAAJ), [Jia-Bin Huang](https://filebox.ece.vt.edu/~jbhuang/), and [Ming-Hsuan Yang](http://faculty.ucmerced.edu/mhyang/)<br>
-European Conference on Computer Vision (ECCV), 2018 (**oral**) (* indicates equal contribution)
+[Hsin-Ying Lee](http://vllab.ucmerced.edu/hylee/)\*, [Hung-Yu Tseng](https://sites.google.com/site/hytseng0509/)\*, [Jia-Bin Huang](https://filebox.ece.vt.edu/~jbhuang/), [Maneesh Kumar Singh](https://scholar.google.com/citations?user=hdQhiFgAAAAJ), and [Ming-Hsuan Yang](http://faculty.ucmerced.edu/mhyang/)<br>
+European Conference on Computer Vision (ECCV), 2018 (**oral**) (* equal contribution)
 
 Please cite our paper if you find it useful for your research.
 ```
 @inproceedings{lee_drit_2018,
-  author = {Lee, H.-Y. and Tseng, H.-Y. and Singh, M.K. and Huang, J.-B. and Yang, M.-H.},
+  author = {Lee, Hsin-Ying. and Tseng, Hung-Yu. and Singh, Maneesh Kumar and Huang, Jia-Bin and Yang, Ming-Hsuan},
   booktitle = {European Conference on Computer Vision (ECCV)},
   title = {Diverse Image-to-Image Translation via Disentangled Representations},
   year = {2018}
@@ -39,12 +39,12 @@ teaser image
 ### Install
 - Clone this repo:
 ```
-git clone ...
+git clone https://github.com/HsinYingLee/OPN.git
 cd DRIT/src
 ```
 
 ## Dataset
-link for yosemite
+link for photo <-> portrait
 
 ## Training Examples
 - Yosemite summer <-> winter translation
@@ -54,12 +54,12 @@ tensorboard --logdir ../logs yosemite
 ```
 Results and saved models can be found at `../results/yosemite`.
 
-- cats <-> dogs translation
+- Photo <-> portrait translation
 ```
-python3 train.py --dataroot ../datasets/yosemite --name cat2dog
-tensorboard --logdir ../logs cat2dog
+python3 train.py --dataroot ../datasets/photo2portrait --name photo2portrait
+tensorboard --logdir ../logs photo2portarit
 ```
-Results and saved models can be found at `../results/cat2dog`.
+Results and saved models can be found at `../results/photo2portrait`.
 
 ## Testing Example
 - Download a pre-trained model
