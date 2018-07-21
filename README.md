@@ -2,6 +2,8 @@
 
 <img src='imgs/emma2portrait.gif' align="right" width=384>
 
+<br><br><br>
+
 # Diverse Image-to-Image Translation via Disentangled Representations
 [[Project Page]]()[[Paper]]()
 
