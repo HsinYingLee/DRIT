@@ -13,7 +13,7 @@ def main():
   # daita loader
   print('\n--- load dataset ---')
   datasetA = dataset_single(opts, 'A', opts.input_dim_a)
-  datasetB = dataset_single(opts, 'B', opts.input_dim_a)
+  datasetB = dataset_single(opts, 'B', opts.input_dim_b)
   if opts.a2b:
     loader1 = torch.utils.data.DataLoader(datasetA, batch_size=1, num_workers=opts.nThreads)
     loader2 = torch.utils.data.DataLoader(datasetB, batch_size=1, num_workers=opts.nThreads, shuffle=True)

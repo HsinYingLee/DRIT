@@ -86,14 +86,13 @@ class DRIT(nn.Module):
   def get_z_random(self, batchSize, nz, random_type='gauss'):
     z = torch.cuda.FloatTensor(batchSize, nz)
     z.copy_(torch.randn(batchSize, nz))
-    z = Variable(z)
     return z
 
   def test_forward(self, image_a, image_b, random_z=False, a2b=True, idx=0):
     self.z_content_a, self.z_content_b = self.enc_c.forward(image_a, image_b)
     if random_z:
       self.z_random = self.get_z_random(image_a.size(0), self.nz, 'gauss')
-      np.save('gg/{}'.format(idx), self.z_random.cpu().numpy())
+      #np.save('gg/{}'.format(idx), self.z_random.cpu().numpy())
       if a2b:
         image = self.gen.forward_b(self.z_content_a, self.z_random)
       else:
