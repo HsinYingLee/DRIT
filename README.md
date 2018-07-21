@@ -1,9 +1,6 @@
-#![Python 3.6](https://img.shields.io/badge/python-3.6-green.svg)
+![Python 3.6](https://img.shields.io/badge/python-3.6-green.svg)
 
-#<img src='imgs/emma2portrait.gif' align="right" width=384>
 <img src='imgs/emma2portrait.gif' width=384>
-
-#<br><br><br>
 
 # Diverse Image-to-Image Translation via Disentangled Representations
 [[Project Page]]()[[Paper]]()
