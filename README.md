@@ -71,7 +71,7 @@ Results can be found at `../outputs/yosemite`.
 
 ## Training options and tips
 - Due to the usage of adaptive pooling for attribute encoders, our model support various input size. For example, here's the results of Grayscale -> RGB using 340x340 images.
-<img src='' width="1000px"/>
+<img src='imgs/flower.png' width="800px"/>
 
 - We provide two different methods for combining content representation and attribute vector. One is simple concatenation, the other is xxxxx. In our experience, if the translation involves less shape variation (e.g. Winter2Summer), simple concatentation produces better results. On the other hand, the translation with shape variation (e.g. cat2dog, celeb2portrait), xxx should be use (i.e. set --concat 0) in order to generate diverse results.
 
