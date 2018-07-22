@@ -443,28 +443,6 @@ def gaussian_weights_init(m):
 ####################################################################
 #-------------------------- Basic Blocks -------------------------- 
 ####################################################################
-class AdainNorm2d(nn.Module):
-  def __init__(self, n_out, eps=1e-5, momentum=0.1):
-    super(AdainNorm2d, self).__init__()
-    self.n_out = n_out
-    self.eps = eps
-    self.momentum = momentum
-    self.weight = None
-    self.bias = None
-    self.register_buffer('running_mean', torch.zeros(n_out))
-    self.register_buffer('running_var', torch.ones(n_out))
-    return
-  def forward(self, x):
-    assert self.weight is not None and self.bias is not None, "AdaNorm2d not initialized"
-    b, c = x.size(0), x.size(1)
-    running_mean = self.running_mean.repeat(b)
-    running_var = self.running_var.repeat(b)
-    x = x.contiguous().view(1, b*c, *x.size()[2:])
-    out = F.batch_norm(x, running_mean, running_var, self.weight, self.bias, True, self.momentum, self.eps)
-    return out.view(b, c, *x.size()[2:])
-  def __repr__(self):
-    return self.__class__.__name__ + '(' + str(self.n_out) + ')'
-
 class LayerNorm(nn.Module):
   def __init__(self, n_out, eps=1e-5, affine=True):
     super(LayerNorm, self).__init__()
@@ -609,26 +587,6 @@ class MisINSResBlock(nn.Module):
     o2 = self.blk1(torch.cat([o1, z_expand], dim=1))
     o3 = self.conv2(o2)
     out = self.blk2(torch.cat([o3, z_expand], dim=1))
-    out += residual
-    return out
-
-class ADAINResBlock(nn.Module):
-  def conv3x3(self, inplanes, out_planes, stride=1):
-    return nn.Conv2d(inplanes, out_planes, kernel_size=3, stride=stride, padding=1)
-  def __init__(self, inplanes, planes, stride=1, dropout=0.0):
-    super(ADAINResBlock, self).__init__()
-    model = []
-    model += [self.conv3x3(inplanes, planes, stride)]
-    model += [AdainNorm2d(planes)]
-    model += [nn.ReLU(inplace=True)]
-    model += [self.conv3x3(planes, planes)]
-    if dropout > 0:
-      model += [nn.Dropout(p=dropout)]
-    self.model = nn.Sequential(*model)
-    self.model.apply(gaussian_weights_init)
-  def forward(self, x):
-    residual = x
-    out = self.model(x)
     out += residual
     return out
 

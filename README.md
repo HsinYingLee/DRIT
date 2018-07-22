@@ -56,7 +56,7 @@ Results and saved models can be found at `../results/yosemite`.
 
 - Photo <-> portrait translation
 ```
-python3 train.py --dataroot ../datasets/photo2portrait --name photo2portrait
+python3 train.py --dataroot ../datasets/photo2portrait --name photo2portrait --concat 0
 tensorboard --logdir ../logs photo2portarit
 ```
 Results and saved models can be found at `../results/photo2portrait`.
@@ -78,3 +78,5 @@ Results can be found at `../outputs/yosemite`.
 - In our experience, using multiscale discriminator also always gets better results.
 
 - We also provide option for using spectral normalization(https://arxiv.org/abs/1802.05957). We use the code from the master branch of pytorch since pytorch 0.5.0 is not stable yet. However, despite using spetral normalization significantly stablizes the training, we fail to observe consistent quality improvement. We encourage everyone to play around with various settings and explore better configurations.
+
+- Since the log file will be large if you want to dispaly the images, set "--no_display" if you like to display only the loss values.

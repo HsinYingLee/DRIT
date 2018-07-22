@@ -22,6 +22,7 @@ class TrainOptions():
     self.parser.add_argument('--display_freq', type=int, default=1, help='freq (iteration) of display')
     self.parser.add_argument('--img_save_freq', type=int, default=50, help='freq (epoch) of saving images')
     self.parser.add_argument('--model_save_freq', type=int, default=10, help='freq (epoch) of saving models')
+    self.parser.add_argument('--no_displayimg', action='store_true', help='specified if no dispaly')
 
     # training related
     self.parser.add_argument('--concat', type=int, default=1, help='concatenate attribute features for translation')
