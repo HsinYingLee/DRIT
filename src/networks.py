@@ -6,15 +6,15 @@ from torch.optim import lr_scheduler
 import torch.nn.functional as F
 
 ####################################################################
-#------------------------- Discriminators -------------------------- 
+#------------------------- Discriminators --------------------------
 ####################################################################
 class Dis_content(nn.Module):
   def __init__(self):
     super(Dis_content, self).__init__()
     model = []
-    model += [LeakyReLUINSConv2d(256, 256, kernel_size=7, stride=2, padding=1)]
-    model += [LeakyReLUINSConv2d(256, 256, kernel_size=7, stride=2, padding=1)]
-    model += [LeakyReLUINSConv2d(256, 256, kernel_size=7, stride=2, padding=1)]
+    model += [LeakyReLUConv2d(256, 256, kernel_size=7, stride=2, padding=1, norm='Instance')]
+    model += [LeakyReLUConv2d(256, 256, kernel_size=7, stride=2, padding=1, norm='Instance')]
+    model += [LeakyReLUConv2d(256, 256, kernel_size=7, stride=2, padding=1, norm='Instance')]
     model += [LeakyReLUConv2d(256, 256, kernel_size=4, stride=1, padding=0)]
     model += [nn.Conv2d(256, 1, kernel_size=1, stride=1, padding=0)]
     self.model = nn.Sequential(*model)
@@ -27,22 +27,25 @@ class Dis_content(nn.Module):
     return outs
 
 class MultiScaleDis(nn.Module):
-  def __init__(self, input_dim, n_scale=3, n_layer=4):
+  def __init__(self, input_dim, n_scale=3, n_layer=4, norm='None', sn=False):
     super(MultiScaleDis, self).__init__()
     ch = 64
     self.downsample = nn.AvgPool2d(3, stride=2, padding=1, count_include_pad=False)
     self.Diss = nn.ModuleList()
     for _ in range(n_scale):
-      self.Diss.append(self._make_net(ch, input_dim, n_layer))
+      self.Diss.append(self._make_net(ch, input_dim, n_layer, norm, sn))
 
-  def _make_net(self, ch, input_dim, n_layer):
+  def _make_net(self, ch, input_dim, n_layer, norm, sn):
     model = []
-    model += [LeakyReLUINSConv2d(input_dim, ch, 4, 2, 1)]
+    model += [LeakyReLUConv2d(input_dim, ch, 4, 2, 1, norm, sn)]
     tch = ch
     for _ in range(1, n_layer):
-      model += [LeakyReLUINSConv2d(tch, tch * 2, 4, 2, 1)]
+      model += [LeakyReLUConv2d(tch, tch * 2, 4, 2, 1, norm, sn)]
       tch *= 2
-    model += [nn.Conv2d(tch, 1, 1, 1, 0)]
+    if sn:
+      model += [spectral_norm(nn.Conv2d(tch, 1, 1, 1, 0))]
+    else:
+      model += [nn.Conv2d(tch, 1, 1, 1, 0)]
     return nn.Sequential(*model)
 
   def forward(self, x):
@@ -53,39 +56,39 @@ class MultiScaleDis(nn.Module):
     return outs
 
 class Dis(nn.Module):
-  def __init__(self, input_dim):
+  def __init__(self, input_dim, norm='None', sn=False):
     super(Dis, self).__init__()
     ch = 64
     n_layer = 6
-    self.model_A = self._make_net(ch, input_dim, n_layer)
+    self.model = self._make_net(ch, input_dim, n_layer, norm, sn)
 
-  def _make_net(self, ch, input_dim, n_layer):
+  def _make_net(self, ch, input_dim, n_layer, norm, sn):
     model = []
-    model += [LeakyReLUINSConv2d(input_dim, ch, kernel_size=3, stride=2, padding=1)] #16
-    #model += [Spectral_LeakyReLUConv2d(input_dim, ch, kernel_size=3, stride=2, padding=1)] #16
+    model += [LeakyReLUConv2d(input_dim, ch, kernel_size=3, stride=2, padding=1, norm=norm, sn=sn)] #16
     tch = ch
     for i in range(1, n_layer-1):
-      model += [LeakyReLUINSConv2d(tch, tch * 2, kernel_size=3, stride=2, padding=1)] # 8
-      #model += [Spectral_LeakyReLUConv2d(tch, tch * 2, kernel_size=3, stride=2, padding=1)] # 8
+      model += [LeakyReLUConv2d(tch, tch * 2, kernel_size=3, stride=2, padding=1, norm=norm, sn=sn)] # 8
       tch *= 2
-    model += [LeakyReLUConv2d(tch, tch * 2, kernel_size=3, stride=2, padding=1)] # 1
+    model += [LeakyReLUConv2d(tch, tch * 2, kernel_size=3, stride=2, padding=1, norm='None', sn=sn)] # 2
     tch *= 2
-    model += [nn.Conv2d(tch, 1, kernel_size=1, stride=1, padding=0)]  # 1
-    #model += [spectral_norm(nn.Conv2d(tch, 1, kernel_size=1, stride=1, padding=0))]  # 1
+    if sn:
+      model += [spectral_norm(nn.Conv2d(tch, 1, kernel_size=1, stride=1, padding=0))]  # 1
+    else:
+      model += [nn.Conv2d(tch, 1, kernel_size=1, stride=1, padding=0)]  # 1
     return nn.Sequential(*model)
 
   def cuda(self,gpu):
-    self.model_A.cuda(gpu)
+    self.model.cuda(gpu)
 
   def forward(self, x_A):
-    out_A = self.model_A(x_A)
+    out_A = self.model(x_A)
     out_A = out_A.view(-1)
     outs_A = []
     outs_A.append(out_A)
     return outs_A
 
 ####################################################################
-#---------------------------- Encoders ----------------------------- 
+#---------------------------- Encoders -----------------------------
 ####################################################################
 class E_content(nn.Module):
   def __init__(self, input_dim_a, input_dim_b):
@@ -129,7 +132,7 @@ class E_content(nn.Module):
     outputA = self.conv_share(outputA)
     return outputA
 
-  def forward(self, xb):
+  def forward_b(self, xb):
     outputB = self.convB(xb)
     outputB = self.conv_share(outputB)
     return outputB
@@ -178,7 +181,7 @@ class E_attr(nn.Module):
     output_A = xa.view(xa.size(0), -1)
     return output_A
 
-  def forward(self, xb):
+  def forward_b(self, xb):
     xb = self.model_b(xb)
     output_B = xb.view(xb.size(0), -1)
     return output_B
@@ -229,14 +232,15 @@ class E_attr_concat(nn.Module):
     outputVar_A = self.fcVar_A(conv_flat_A)
     return output_A, outputVar_A
 
-  def forward(self, xb):
+  def forward_b(self, xb):
+    x_conv_B = self.conv_B(xb)
     conv_flat_B = x_conv_B.view(xb.size(0), -1)
     output_B = self.fc_B(conv_flat_B)
     outputVar_B = self.fcVar_B(conv_flat_B)
     return output_B, outputVar_B
 
 ####################################################################
-#--------------------------- Generators ---------------------------- 
+#--------------------------- Generators ----------------------------
 ####################################################################
 class G(nn.Module):
   def __init__(self, output_dim_a, output_dim_b, nz):
@@ -250,7 +254,7 @@ class G(nn.Module):
     self.decA2 = MisINSResBlock(tch, tch_add)
     self.decA3 = MisINSResBlock(tch, tch_add)
     self.decA4 = MisINSResBlock(tch, tch_add)
- 
+
     decA5 = []
     decA5 += [ReLUINSConvTranspose2d(tch, tch//2, kernel_size=3, stride=2, padding=1, output_padding=1)]
     tch = tch//2
@@ -385,7 +389,7 @@ class G_concat(nn.Module):
     return out4
 
 ####################################################################
-#------------------------- Basic Functions ------------------------- 
+#------------------------- Basic Functions -------------------------
 ####################################################################
 def get_scheduler(optimizer, opts, cur_ep=-1):
   if opts.lr_policy == 'lambda':
@@ -441,7 +445,7 @@ def gaussian_weights_init(m):
     m.weight.data.normal_(0.0, 0.02)
 
 ####################################################################
-#-------------------------- Basic Blocks -------------------------- 
+#-------------------------- Basic Blocks --------------------------
 ####################################################################
 class LayerNorm(nn.Module):
   def __init__(self, n_out, eps=1e-5, affine=True):
@@ -481,7 +485,24 @@ class BasicBlock(nn.Module):
     out = self.conv(x) + self.shortcut(x)
     return out
 
-class Spectral_LeakyReLUConv2d(nn.Module):
+class LeakyReLUConv2d(nn.Module):
+  def __init__(self, n_in, n_out, kernel_size, stride, padding=0, norm='None', sn=False):
+    super(LeakyReLUConv2d, self).__init__()
+    model = []
+    if sn:
+      model += [spectral_norm(nn.Conv2d(n_in, n_out, kernel_size=kernel_size, stride=stride, padding=padding, bias=True))]
+    else:
+      model += [nn.Conv2d(n_in, n_out, kernel_size=kernel_size, stride=stride, padding=padding, bias=True)]
+    if 'norm' == 'Instance':
+      model += [nn.InstanceNorm2d(n_out, affine=False)]
+    model += [nn.LeakyReLU(inplace=True)]
+    self.model = nn.Sequential(*model)
+    self.model.apply(gaussian_weights_init)
+    #elif == 'Group'
+  def forward(self, x):
+    return self.model(x)
+
+'''class Spectral_LeakyReLUConv2d(nn.Module):
   def __init__(self, n_in, n_out, kernel_size, stride, padding=0):
     super(Spectral_LeakyReLUConv2d, self).__init__()
     model = []
@@ -513,7 +534,7 @@ class LeakyReLUINSConv2d(nn.Module):
     self.model = nn.Sequential(*model)
     self.model.apply(gaussian_weights_init)
   def forward(self, x):
-    return self.model(x)
+    return self.model(x)'''
 
 class ReLUINSConv2d(nn.Module):
   def __init__(self, n_in, n_out, kernel_size, stride, padding=0):
@@ -604,6 +625,7 @@ class ReLUINSConvTranspose2d(nn.Module):
     super(ReLUINSConvTranspose2d, self).__init__()
     model = []
     model += [nn.ConvTranspose2d(n_in, n_out, kernel_size=kernel_size, stride=stride, padding=padding, output_padding=output_padding, bias=True)]
+    #model += [nn.LayerNorm()]
     model += [LayerNorm(n_out)]
     model += [nn.ReLU(inplace=True)]
     self.model = nn.Sequential(*model)
@@ -613,7 +635,7 @@ class ReLUINSConvTranspose2d(nn.Module):
 
 
 ####################################################################
-#--------------------- Spectral Normalization --------------------- 
+#--------------------- Spectral Normalization ---------------------
 #  This part of code is copied from pytorch master branch (0.5.0)
 ####################################################################
 class SpectralNorm(object):
@@ -688,3 +710,4 @@ def remove_spectral_norm(module, name='weight'):
       del module._forward_pre_hooks[k]
       return module
   raise ValueError("spectral_norm of '{}' not found in {}".format(name, module))
+

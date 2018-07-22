@@ -2,8 +2,6 @@ import networks
 import torch
 from torch.autograd import Variable
 import torch.nn as nn
-#import itertools
-import numpy as np
 
 class DRIT(nn.Module):
   def __init__(self, opts):
@@ -15,14 +13,16 @@ class DRIT(nn.Module):
     self.concat = opts.concat
 
     # discriminators
-    '''self.disA = networks.Dis(opts.input_dim_a)
-    self.disB = networks.Dis(opts.input_dim_b)
-    self.disA2 = networks.Dis(opts.input_dim_a)
-    self.disB2 = networks.Dis(opts.input_dim_b)'''
-    self.disA = networks.MultiScaleDis(opts.input_dim_a)
-    self.disB = networks.MultiScaleDis(opts.input_dim_b)
-    self.disA2 = networks.MultiScaleDis(opts.input_dim_a)
-    self.disB2 = networks.MultiScaleDis(opts.input_dim_b)
+    if opts.dis_scale > 1:
+      self.disA = networks.MultiScaleDis(opts.input_dim_a, opts.dis_scale, norm=opts.dis_norm, sn=opts.dis_spectral_norm)
+      self.disB = networks.MultiScaleDis(opts.input_dim_b, opts.dis_scale, norm=opts.dis_norm, sn=opts.dis_spectral_norm)
+      self.disA2 = networks.MultiScaleDis(opts.input_dim_a, opts.dis_scale, norm=opts.dis_norm, sn=opts.dis_spectral_norm)
+      self.disB2 = networks.MultiScaleDis(opts.input_dim_b, opts.dis_scale, norm=opts.dis_norm, sn=opts.dis_spectral_norm)
+    else:
+      self.disA = networks.Dis(opts.input_dim_a, norm=opts.dis_norm, sn=opts.dis_spectral_norm)
+      self.disB = networks.Dis(opts.input_dim_b, norm=opts.dis_norm, sn=opts.dis_spectral_norm)
+      self.disA2 = networks.Dis(opts.input_dim_a, norm=opts.dis_norm, sn=opts.dis_spectral_norm)
+      self.disB2 = networks.Dis(opts.input_dim_b, norm=opts.dis_norm, sn=opts.dis_spectral_norm)
     self.disContent = networks.Dis_content()
 
     # encoders

@@ -53,7 +53,7 @@ def main():
         model.update_EG()
 
       # save to display file
-      if not opt.no_dispalyimg:
+      if not opts.no_display_img:
         saver.write_display(total_it, model)
 
       print('total_it: %d (ep %d, it %d), lr %08f' % (total_it, ep, it, model.gen_opt.param_groups[0]['lr']))

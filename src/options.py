@@ -22,10 +22,13 @@ class TrainOptions():
     self.parser.add_argument('--display_freq', type=int, default=1, help='freq (iteration) of display')
     self.parser.add_argument('--img_save_freq', type=int, default=50, help='freq (epoch) of saving images')
     self.parser.add_argument('--model_save_freq', type=int, default=10, help='freq (epoch) of saving models')
-    self.parser.add_argument('--no_displayimg', action='store_true', help='specified if no dispaly')
+    self.parser.add_argument('--no_display_img', action='store_true', help='specified if no dispaly')
 
     # training related
     self.parser.add_argument('--concat', type=int, default=1, help='concatenate attribute features for translation')
+    self.parser.add_argument('--dis_scale', type=int, default=3, help='scale of discriminator')
+    self.parser.add_argument('--dis_norm', type=str, default='None', help='normalization layer in discriminator [None, Instance]')
+    self.parser.add_argument('--dis_spectral_norm', type=int, default=0, help='use spectral normalization in discriminator')
     self.parser.add_argument('--lr_policy', type=str, default='lambda', help='type of learn rate decay')
     self.parser.add_argument('--n_ep', type=int, default=1200, help='number of epochs') # 400 * d_iter
     self.parser.add_argument('--n_ep_decay', type=int, default=600, help='epoch start decay learning rate, set -1 if no decay') # 200 * d_iter
@@ -63,6 +66,9 @@ class TestOptions():
 
     # model related
     self.parser.add_argument('--concat', type=int, default=1, help='concatenate attribute features for translation')
+    self.parser.add_argument('--dis_scale', type=int, default=3, help='scale of discriminator')
+    self.parser.add_argument('--dis_norm', type=str, default='None', help='normalization layer in discriminator [None, Instance]')
+    self.parser.add_argument('--dis_spectral_norm', type=int, default=0, help='use spectral normalization in discriminator')
     self.parser.add_argument('--resume', type=str, default=None, help='specified the dir of saved models for resume the training')
     self.parser.add_argument('--gpu', type=int, default=0, help='gpu')
 
