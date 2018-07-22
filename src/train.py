@@ -62,7 +62,7 @@ def main():
         saver.write_model(-41608, model)
         break
 
-    # decay learn rate
+    # decay learning rate
     if opts.n_ep_decay > -1:
       model.update_lr()
 

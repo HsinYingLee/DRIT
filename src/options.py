@@ -24,7 +24,7 @@ class TrainOptions():
     self.parser.add_argument('--model_save_freq', type=int, default=10, help='freq (epoch) of saving models')
 
     # training related
-    self.parser.add_argument('--concat', type=int, default=0, help='concatenate attribute features for translation')
+    self.parser.add_argument('--concat', type=int, default=1, help='concatenate attribute features for translation')
     self.parser.add_argument('--lr_policy', type=str, default='lambda', help='type of learn rate decay')
     self.parser.add_argument('--n_ep', type=int, default=1200, help='number of epochs') # 400 * d_iter
     self.parser.add_argument('--n_ep_decay', type=int, default=600, help='epoch start decay learning rate, set -1 if no decay') # 200 * d_iter
@@ -47,8 +47,8 @@ class TestOptions():
     # data loader related
     self.parser.add_argument('--dataroot', type=str, required=True, help='path of training data list,   should contain data lists for both domains')
     self.parser.add_argument('--phase', type=str, default='test', help='phase for dataloading')
-    self.parser.add_argument('--resize_size', type=int, default=256, help='resized image size for       training')
-    self.parser.add_argument('--crop_size', type=int, default=216, help='cropped image size for         training')
+    self.parser.add_argument('--resize_size', type=int, default=256, help='resized image size for training')
+    self.parser.add_argument('--crop_size', type=int, default=216, help='cropped image size for training')
     self.parser.add_argument('--nThreads', type=int, default=4, help='for data loader')
     self.parser.add_argument('--input_dim_a', type=int, default=3, help='# of input channels for domain A')
     self.parser.add_argument('--input_dim_b', type=int, default=3, help='# of input channels for domain B')
@@ -58,11 +58,11 @@ class TestOptions():
     # ouptput related
     self.parser.add_argument('--num', type=int, default=5, help='number of outputs per image')
     self.parser.add_argument('--name', type=str, default='trial', help='folder name to save outputs')
-    self.parser.add_argument('--result_dir', type=str, default='../outputs', help='path for saving      result images and models')
+    self.parser.add_argument('--result_dir', type=str, default='../outputs', help='path for saving result images and models')
 
     # model related
-    self.parser.add_argument('--concat', type=int, default=0, help='concatenate attribute features for translation')
-    self.parser.add_argument('--resume', type=str, default=None, help='specified the dir of saved       models for resume the training')
+    self.parser.add_argument('--concat', type=int, default=1, help='concatenate attribute features for translation')
+    self.parser.add_argument('--resume', type=str, default=None, help='specified the dir of saved models for resume the training')
     self.parser.add_argument('--gpu', type=int, default=0, help='gpu')
 
   def parse(self):

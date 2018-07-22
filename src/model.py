@@ -92,7 +92,6 @@ class DRIT(nn.Module):
     self.z_content_a, self.z_content_b = self.enc_c.forward(image_a, image_b)
     if random_z:
       self.z_random = self.get_z_random(image_a.size(0), self.nz, 'gauss')
-      #np.save('/home/ym41608/z/{}'.format(idx), self.z_random.cpu().numpy())
       if a2b:
         image = self.gen.forward_b(self.z_content_a, self.z_random)
       else:
@@ -245,8 +244,6 @@ class DRIT(nn.Module):
       out_real = nn.functional.sigmoid(out_b)
       all0 = torch.zeros_like(out_fake).cuda(self.gpu)
       all1 = torch.ones_like(out_real).cuda(self.gpu)
-      #all1 = torch.ones((out_real.size(0))).cuda(self.gpu)
-      #all0 = torch.zeros((out_fake.size(0))).cuda(self.gpu)
       ad_fake_loss = nn.functional.binary_cross_entropy(out_fake, all0)
       ad_true_loss = nn.functional.binary_cross_entropy(out_real, all1)
       loss_D += ad_true_loss + ad_fake_loss
@@ -350,7 +347,6 @@ class DRIT(nn.Module):
     for out_a in outs_fake:
       outputs_fake = nn.functional.sigmoid(out_a)
       all_ones = torch.ones_like(outputs_fake).cuda(self.gpu)
-      #all_ones = Variable(torch.ones((outputs_fake.size(0))).cuda(self.gpu))
       loss_G += nn.functional.binary_cross_entropy(outputs_fake, all_ones)
     return loss_G
 
@@ -435,7 +431,7 @@ class DRIT(nn.Module):
     torch.save(state, filename)
     return
 
-  def assemble_outputs3(self):
+  def assemble_outputs(self):
     images_a = self.normalize_image(self.real_A_encoded)
     images_b = self.normalize_image(self.real_B_encoded)
     images_a1 = self.normalize_image(self.fake_A_encoded)

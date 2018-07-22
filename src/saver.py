@@ -51,11 +51,11 @@ class Saver():
 
   def write_img(self, ep, model):
     if (ep + 1) % self.img_save_freq == 0:
-      assembled_images = model.assemble_outputs3()
+      assembled_images = model.assemble_outputs()
       img_filename = '%s/gen_%08d.jpg' % (self.image_dir, ep)
       torchvision.utils.save_image(assembled_images.data / 2 + 0.5, img_filename, nrow=1)
     elif ep == -41608:
-      assembled_images = model.assemble_outputs3()
+      assembled_images = model.assemble_outputs()
       img_filename = '%s/gen_last.jpg' % (self.image_dir, ep)
       torchvision.utils.save_image(assembled_images.data / 2 + 0.5, img_filename, nrow=1)
 
