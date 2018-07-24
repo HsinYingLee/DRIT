@@ -18,7 +18,7 @@ class dataset_single(data.Dataset):
     transforms.append(ToTensor())
     transforms.append(Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]))
     self.transforms = Compose(transforms)
-    print('%d images'%(self.size))
+    print('%s: %d images'%(setname, self.size))
     return
 
   def __getitem__(self, index):

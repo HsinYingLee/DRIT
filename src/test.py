@@ -10,7 +10,7 @@ def main():
   parser = TestOptions()
   opts = parser.parse()
 
-  # daita loader
+  # data loader
   print('\n--- load dataset ---')
   datasetA = dataset_single(opts, 'A', opts.input_dim_a)
   datasetB = dataset_single(opts, 'B', opts.input_dim_b)

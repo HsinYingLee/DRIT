@@ -1,15 +1,15 @@
 import networks
 import torch
-from torch.autograd import Variable
 import torch.nn as nn
 
 class DRIT(nn.Module):
   def __init__(self, opts):
     super(DRIT, self).__init__()
 
-    self.nz = 8
+    # parameters
     lr = 0.0001
     lr_dcontent = lr / 2.5
+    self.nz = 8
     self.concat = opts.concat
 
     # discriminators
@@ -88,7 +88,7 @@ class DRIT(nn.Module):
     z.copy_(torch.randn(batchSize, nz))
     return z
 
-  def test_forward(self, image_a, image_b, random_z=False, a2b=True, idx=0):
+  def test_forward(self, image_a, image_b, random_z=False, a2b=True):
     self.z_content_a, self.z_content_b = self.enc_c.forward(image_a, image_b)
     if random_z:
       self.z_random = self.get_z_random(image_a.size(0), self.nz, 'gauss')
@@ -138,7 +138,7 @@ class DRIT(nn.Module):
     else:
       self.z_attr_a, self.z_attr_b = self.enc_a.forward(self.real_A_encoded, self.real_B_encoded)
 
-    # get random z
+    # get random z_a
     self.z_random = self.get_z_random(self.real_A_encoded.size(0), self.nz, 'gauss')
 
     # first cross translation
@@ -337,7 +337,7 @@ class DRIT(nn.Module):
     outs = self.disContent.forward(data)
     for out in outs:
       outputs_fake = nn.functional.sigmoid(out)
-      all_half = Variable(0.5*torch.ones((outputs_fake.size(0))).cuda(self.gpu))
+      all_half = 0.5*torch.ones((outputs_fake.size(0))).cuda(self.gpu)
       ad_loss = nn.functional.binary_cross_entropy(outputs_fake, all_half)
     return ad_loss
 

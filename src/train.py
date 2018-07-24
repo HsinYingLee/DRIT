@@ -1,5 +1,4 @@
 import torch
-from torch.autograd import Variable
 from options import TrainOptions
 from dataset import dataset_unpair
 from model import DRIT
@@ -41,8 +40,8 @@ def main():
         continue
 
       # input data
-      images_a = Variable(images_a.cuda(opts.gpu))
-      images_b = Variable(images_b.cuda(opts.gpu))
+      images_a = images_a.cuda(opts.gpu)
+      images_b = images_b.cuda(opts.gpu)
 
       # update model
       if (it + 1) % opts.d_iter != 0:
