@@ -25,7 +25,7 @@ def main():
   print('\n--- load model ---')
   model = DRIT(opts)
   model.setgpu(opts.gpu)
-  model.resume(opts.resume)
+  model.resume(opts.resume, train=False)
   model.eval()
 
   # directory
@@ -46,9 +46,9 @@ def main():
       img2 = img2.cuda()
       with torch.no_grad():
         if opts.a2b:
-          img = model.test_forward(img1, img2, opts.random_z, a2b=True, idx=idx2)
+          img = model.test_forward(img1, img2, opts.random_z, a2b=True)
         else:
-          img = model.test_forward(img2, img1, opts.random_z, a2b=False, idx=idx2)
+          img = model.test_forward(img2, img1, opts.random_z, a2b=False)
       imgs.append(img)
       names.append('output_{}'.format(idx2))
     save_imgs(imgs, names, os.path.join(result_dir, '{}'.format(idx1)))
