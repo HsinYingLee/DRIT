@@ -77,5 +77,5 @@ class TestOptions():
     # set irrelevant options
     self.opt.dis_scale = 3
     self.opt.dis_norm = 'None'
-    self.dis_spectral_norm = 0
+    self.opt.dis_spectral_norm = 0
     return self.opt
