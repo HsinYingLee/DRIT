@@ -56,8 +56,7 @@ class TestOptions():
     self.parser.add_argument('--nThreads', type=int, default=4, help='for data loader')
     self.parser.add_argument('--input_dim_a', type=int, default=3, help='# of input channels for domain A')
     self.parser.add_argument('--input_dim_b', type=int, default=3, help='# of input channels for domain B')
-    self.parser.add_argument('--a2b', type=int, default=1, help='translation direction')
-    self.parser.add_argument('--random_z', type=int, default=1, help='use random attr or encoded   attr')
+    self.parser.add_argument('--a2b', type=int, default=1, help='translation direction, 1 for a2b, 0 for b2a')
 
     # ouptput related
     self.parser.add_argument('--num', type=int, default=5, help='number of outputs per image')
@@ -66,10 +65,7 @@ class TestOptions():
 
     # model related
     self.parser.add_argument('--concat', type=int, default=1, help='concatenate attribute features for translation')
-    self.parser.add_argument('--dis_scale', type=int, default=3, help='scale of discriminator')
-    self.parser.add_argument('--dis_norm', type=str, default='None', help='normalization layer in discriminator [None, Instance]')
-    self.parser.add_argument('--dis_spectral_norm', type=int, default=0, help='use spectral normalization in discriminator')
-    self.parser.add_argument('--resume', type=str, default=None, help='specified the dir of saved models for resume the training')
+    self.parser.add_argument('--resume', type=str, required=True, help='specified the dir of saved models for resume the training')
     self.parser.add_argument('--gpu', type=int, default=0, help='gpu')
 
   def parse(self):
@@ -78,4 +74,8 @@ class TestOptions():
     print('\n--- load options ---')
     for name, value in sorted(args.items()):
       print('%s: %s' % (str(name), str(value)))
+    # set irrelevant options
+    self.opt.dis_scale = 3
+    self.opt.dis_norm = 'None'
+    self.dis_spectral_norm = 0
     return self.opt
