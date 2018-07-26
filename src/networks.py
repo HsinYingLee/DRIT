@@ -447,6 +447,10 @@ def gaussian_weights_init(m):
 ####################################################################
 #-------------------------- Basic Blocks --------------------------
 ####################################################################
+
+## The code of LayerNorm is copied from MUNIT (https://github.com/NVlabs/MUNIT)
+## pytorch 0.4.0 already supports LayerNorm
+## We will incorporate the built-in LayerNorm function in the future
 class LayerNorm(nn.Module):
   def __init__(self, n_out, eps=1e-5, affine=True):
     super(LayerNorm, self).__init__()
@@ -501,40 +505,6 @@ class LeakyReLUConv2d(nn.Module):
     #elif == 'Group'
   def forward(self, x):
     return self.model(x)
-
-'''class Spectral_LeakyReLUConv2d(nn.Module):
-  def __init__(self, n_in, n_out, kernel_size, stride, padding=0):
-    super(Spectral_LeakyReLUConv2d, self).__init__()
-    model = []
-    model += [spectral_norm(nn.Conv2d(n_in, n_out, kernel_size=kernel_size, stride=stride, padding=padding, bias=True))]
-    model += [nn.LeakyReLU(inplace=True)]
-    self.model = nn.Sequential(*model)
-    self.model.apply(gaussian_weights_init)
-  def forward(self, x):
-    return self.model(x)
-
-class LeakyReLUConv2d(nn.Module):
-  def __init__(self, n_in, n_out, kernel_size, stride, padding=0):
-    super(LeakyReLUConv2d, self).__init__()
-    model = []
-    model += [nn.Conv2d(n_in, n_out, kernel_size=kernel_size, stride=stride, padding=padding, bias=True)]
-    model += [nn.LeakyReLU(inplace=True)]
-    self.model = nn.Sequential(*model)
-    self.model.apply(gaussian_weights_init)
-  def forward(self, x):
-    return self.model(x)
-
-class LeakyReLUINSConv2d(nn.Module):
-  def __init__(self, n_in, n_out, kernel_size, stride, padding=0):
-    super(LeakyReLUINSConv2d, self).__init__()
-    model = []
-    model += [nn.Conv2d(n_in, n_out, kernel_size=kernel_size, stride=stride, padding=padding, bias=True)]
-    model += [nn.InstanceNorm2d(n_out, affine=False)]
-    model += [nn.LeakyReLU(inplace=True)]
-    self.model = nn.Sequential(*model)
-    self.model.apply(gaussian_weights_init)
-  def forward(self, x):
-    return self.model(x)'''
 
 class ReLUINSConv2d(nn.Module):
   def __init__(self, n_in, n_out, kernel_size, stride, padding=0):
