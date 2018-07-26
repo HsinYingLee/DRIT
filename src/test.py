@@ -32,14 +32,14 @@ def main():
 
   # test
   print('\n--- testing ---')
-  for idx1, img1 in enumerate(loader1):
+  for idx1, img1 in enumerate(loader):
     print('{}/{}'.format(idx1, len(loader)))
     img1 = img1.cuda()
     imgs = [img1]
     names = ['input']
-    for n in range(opts.num):
+    for idx2 in range(opts.num):
       with torch.no_grad():
-        img = model.test_forward(img1, a2b=opts.a2d)
+        img = model.test_forward(img1, a2b=opts.a2b)
       imgs.append(img)
       names.append('output_{}'.format(idx2))
     save_imgs(imgs, names, os.path.join(result_dir, '{}'.format(idx1)))

@@ -1,4 +1,4 @@
-![Python 3.6](https://img.shields.io/badge/python-3.6-green.svg)
+![Python 3.5](https://img.shields.io/badge/python-3.5-green.svg)
 
 <img src='imgs/emma2portrait.gif' width=384>
 
@@ -30,7 +30,7 @@ Please cite our paper if you find it useful for your research.
 ## Usage
 
 ### Prerequisites
-- Python 3.6
+- Python 3.5
 - Pytorch 4.0 and torchvision (https://pytorch.org/)
 - [TensorboardX](https://github.com/lanpa/tensorboard-pytorch)
 - [Tensorflow](https://www.tensorflow.org/) (for tensorboard usage)
@@ -49,15 +49,15 @@ link for photo <-> portrait
 ## Training Examples
 - Yosemite summer <-> winter translation
 ```
-python3 train.py --dataroot ../datasets/yosemite --name yosemite
-tensorboard --logdir ../logs yosemite
+python3 train.py --dataroot ../datasets/yosemite -name yosemite
+tensorboard --logdir ../logs/yosemite
 ```
 Results and saved models can be found at `../results/yosemite`.
 
 - Photo <-> portrait translation
 ```
 python3 train.py --dataroot ../datasets/photo2portrait --name photo2portrait --concat 0
-tensorboard --logdir ../logs photo2portarit
+tensorboard --logdir ../logs/photo2portarit
 ```
 Results and saved models can be found at `../results/photo2portrait`.
 
@@ -69,7 +69,7 @@ Results and saved models can be found at `../results/photo2portrait`.
 python3 test.py --dataroot ../datasets/yosemite --name yosemite --resume ../models/example.pth --a2b 1 --num 5
 ```
 
-- Generate results in domain B from domain A
+- Generate results with given attributes
   - Require both folders 'testA' and 'testB' under dataroot
 ```
 python3 test_transfer.py --dataroot ../datasets/yosemite --name yosemite --resume ../models/example.pth --a2b 1 --num 5

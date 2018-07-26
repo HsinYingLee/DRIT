@@ -16,10 +16,10 @@ def main():
   datasetB = dataset_single(opts, 'B', opts.input_dim_b)
   if opts.a2b:
     loader = torch.utils.data.DataLoader(datasetA, batch_size=1, num_workers=opts.nThreads)
-    loader_attr = torch.utils.data.DataLoader(datasetB, batch_size=1, num_workers=opts.nThreads, shuffle=False)
+    loader_attr = torch.utils.data.DataLoader(datasetB, batch_size=1, num_workers=opts.nThreads, shuffle=True)
   else:
     loader = torch.utils.data.DataLoader(datasetB, batch_size=1, num_workers=opts.nThreads)
-    loader_attr = torch.utils.data.DataLoader(datasetA, batch_size=1, num_workers=opts.nThreads, shuffle=False
+    loader_attr = torch.utils.data.DataLoader(datasetA, batch_size=1, num_workers=opts.nThreads, shuffle=True)
 
   # model
   print('\n--- load model ---')
@@ -48,7 +48,7 @@ def main():
         if opts.a2b:
           img = model.test_forward_transfer(img1, img2, a2b=True)
         else:
-          img = model.test_forward_transf(img2, img1, a2b=False)
+          img = model.test_forward_transfer(img2, img1, a2b=False)
       imgs.append(img)
       names.append('output_{}'.format(idx2))
     save_imgs(imgs, names, os.path.join(result_dir, '{}'.format(idx1)))
