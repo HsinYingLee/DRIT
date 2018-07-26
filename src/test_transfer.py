@@ -12,11 +12,14 @@ def main():
 
   # data loader
   print('\n--- load dataset ---')
+  datasetA = dataset_single(opts, 'A', opts.input_dim_a)
+  datasetB = dataset_single(opts, 'B', opts.input_dim_b)
   if opts.a2b:
-    dataset = dataset_single(opts, 'A', opts.input_dim_a)
+    loader = torch.utils.data.DataLoader(datasetA, batch_size=1, num_workers=opts.nThreads)
+    loader_attr = torch.utils.data.DataLoader(datasetB, batch_size=1, num_workers=opts.nThreads, shuffle=False)
   else:
-    dataset = dataset_single(opts, 'B', opts.input_dim_b)
-  loader = torch.utils.data.DataLoader(dataset, batch_size=1, num_workers=opts.nThreads)
+    loader = torch.utils.data.DataLoader(datasetB, batch_size=1, num_workers=opts.nThreads)
+    loader_attr = torch.utils.data.DataLoader(datasetA, batch_size=1, num_workers=opts.nThreads, shuffle=False
 
   # model
   print('\n--- load model ---')
@@ -32,14 +35,20 @@ def main():
 
   # test
   print('\n--- testing ---')
-  for idx1, img1 in enumerate(loader1):
+  for idx1, img1 in enumerate(loader):
     print('{}/{}'.format(idx1, len(loader)))
     img1 = img1.cuda()
     imgs = [img1]
     names = ['input']
-    for n in range(opts.num):
+    for idx2, img2 in enumerate(loader_attr):
+      if idx2 == opts.num:
+        break
+      img2 = img2.cuda()
       with torch.no_grad():
-        img = model.test_forward(img1, a2b=opts.a2d)
+        if opts.a2b:
+          img = model.test_forward_transfer(img1, img2, a2b=True)
+        else:
+          img = model.test_forward_transf(img2, img1, a2b=False)
       imgs.append(img)
       names.append('output_{}'.format(idx2))
     save_imgs(imgs, names, os.path.join(result_dir, '{}'.format(idx1)))

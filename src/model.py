@@ -88,30 +88,33 @@ class DRIT(nn.Module):
     z.copy_(torch.randn(batchSize, nz))
     return z
 
-  def test_forward(self, image_a, image_b, random_z=False, a2b=True):
-    self.z_content_a, self.z_content_b = self.enc_c.forward(image_a, image_b)
-    if random_z:
-      self.z_random = self.get_z_random(image_a.size(0), self.nz, 'gauss')
-      if a2b:
-        image = self.gen.forward_b(self.z_content_a, self.z_random)
-      else:
-        image = self.gen.forward_a(self.z_content_b, self.z_random)
+  def test_forward(self, image, a2b=True):
+    self.z_random = self.get_z_random(image.size(0), self.nz, 'gauss')
+    if a2b:
+        self.z_content = self.enc_c.forward_a(image)
+        output = self.gen.forward_b(self.z_content, self.z_random)
     else:
-      if self.concat:
-        self.mu_a, self.logvar_a, self.mu_b, self.logvar_b = self.enc_a.forward(image_a, image_b)
-        std_a = self.logvar_a.mul(0.5).exp_()
-        eps = self.get_z_random(std_a.size(0), std_a.size(1), 'gauss')
-        self.z_attr_a = eps.mul(std_a).add_(self.mu_a)
-        std_b = self.logvar_b.mul(0.5).exp_()
-        eps = self.get_z_random(std_a.size(0), std_a.size(1), 'gauss')
-        self.z_attr_b = eps.mul(std_b).add_(self.mu_b)
-      else:
-        self.z_attr_a, self.z_attr_b = self.enc_a.forward(image_a, image_b)
-      if a2b:
-        image = self.gen.forward_b(self.z_content_a, self.z_attr_b)
-      else:
-        image = self.gen.forward_a(self.z_content_b, self.z_attr_a)
-    return image
+        self.z_content = self.enc_c.forward_b(image)
+        output = self.gen.forward_a(self.z_content, self.z_random)
+    return output
+
+  def test_forward_transfer(self, image_a, image_b, a2b=True):
+    self.z_content_a, self.z_content_b = self.enc_c.forward(image_a, image_b)
+    if self.concat:
+      self.mu_a, self.logvar_a, self.mu_b, self.logvar_b = self.enc_a.forward(image_a, image_b)
+      std_a = self.logvar_a.mul(0.5).exp_()
+      eps = self.get_z_random(std_a.size(0), std_a.size(1), 'gauss')
+      self.z_attr_a = eps.mul(std_a).add_(self.mu_a)
+      std_b = self.logvar_b.mul(0.5).exp_()
+      eps = self.get_z_random(std_a.size(0), std_a.size(1), 'gauss')
+      self.z_attr_b = eps.mul(std_b).add_(self.mu_b)
+    else:
+      self.z_attr_a, self.z_attr_b = self.enc_a.forward(image_a, image_b)
+    if a2b:
+      output = self.gen.forward_b(self.z_content_a, self.z_attr_b)
+    else:
+      output = self.gen.forward_a(self.z_content_b, self.z_attr_a)
+    return output
 
   def forward(self):
     # input images

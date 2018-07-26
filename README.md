@@ -63,9 +63,16 @@ Results and saved models can be found at `../results/photo2portrait`.
 
 ## Testing Example
 - Download a pre-trained model
-- Generate results in domain B from domain A
+- Generate results with randomly sampled attributes
+  - Require folder 'testA' (for a2b) or 'testB' (for b2a) under dataroot
 ```
-python3 test.py --dataroot ../datasets/yosemite --a2b 1 --name yosemite --resume ../models/example.pth
+python3 test.py --dataroot ../datasets/yosemite --name yosemite --resume ../models/example.pth --a2b 1 --num 5
+```
+
+- Generate results in domain B from domain A
+  - Require both folders 'testA' and 'testB' under dataroot
+```
+python3 test_transfer.py --dataroot ../datasets/yosemite --name yosemite --resume ../models/example.pth --a2b 1 --num 5
 ```
 Results can be found at `../outputs/yosemite`.
 
