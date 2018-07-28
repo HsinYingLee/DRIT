@@ -463,8 +463,12 @@ class LayerNorm(nn.Module):
     return
   def forward(self, x):
     shape = [-1] + [1]*(x.dim() - 1)
-    mean = x.view(x.size(0), -1).mean(1).view(*shape)
-    std = x.view(x.size(0), -1).std(1).view(*shape)
+    #mean = x.view(x.size(0), -1).mean(1).view(*shape)
+    #std = x.view(x.size(0), -1).std(1).view(*shape)
+    ## work for batch size = 1
+    assert(x.size(0) == 1)
+    mean = x.mean()
+    std = x.std()
     x = (x - mean) / (std + self.eps)
     if self.affine:
       shape = [1, -1] + [1]*(x.dim() - 2)
@@ -587,7 +591,7 @@ class GaussianNoiseLayer(nn.Module):
   def forward(self, x):
     if self.training == False:
       return x
-    noise = Variable(torch.randn(x.size()).cuda(x.data.get_device()))
+    noise = Variable(torch.randn(x.size()).cuda(x.get_device()))
     return x + noise
 
 class ReLUINSConvTranspose2d(nn.Module):
@@ -595,7 +599,6 @@ class ReLUINSConvTranspose2d(nn.Module):
     super(ReLUINSConvTranspose2d, self).__init__()
     model = []
     model += [nn.ConvTranspose2d(n_in, n_out, kernel_size=kernel_size, stride=stride, padding=padding, output_padding=output_padding, bias=True)]
-    #model += [nn.LayerNorm()]
     model += [LayerNorm(n_out)]
     model += [nn.ReLU(inplace=True)]
     self.model = nn.Sequential(*model)

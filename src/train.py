@@ -40,8 +40,10 @@ def main():
         continue
 
       # input data
-      images_a = images_a.cuda(opts.gpu)
-      images_b = images_b.cuda(opts.gpu)
+      #images_a = images_a.cuda(opts.gpu)
+      #images_b = images_b.cuda(opts.gpu)
+      images_a = images_a.cuda(opts.gpu).detach()
+      images_b = images_b.cuda(opts.gpu).detach()
 
       # update model
       if (it + 1) % opts.d_iter != 0:
