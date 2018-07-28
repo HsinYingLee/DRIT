@@ -463,12 +463,13 @@ class LayerNorm(nn.Module):
     return
   def forward(self, x):
     shape = [-1] + [1]*(x.dim() - 1)
-    #mean = x.view(x.size(0), -1).mean(1).view(*shape)
-    #std = x.view(x.size(0), -1).std(1).view(*shape)
+    mean = x.view(x.size(0), -1).mean(1).view(*shape)
+    std = x.view(x.size(0), -1).std(1).view(*shape)
     ## work for batch size = 1
-    assert(x.size(0) == 1)
-    mean = x.mean()
-    std = x.std()
+    #print(x.size())
+    #assert(x.size(0) == 1)
+    #mean = x.mean()
+    #std = x.std()
     x = (x - mean) / (std + self.eps)
     if self.affine:
       shape = [1, -1] + [1]*(x.dim() - 2)
