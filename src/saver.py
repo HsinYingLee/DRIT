@@ -44,7 +44,7 @@ class Saver():
       for m in members:
         self.writer.add_scalar(m, getattr(model, m), total_it)
       # write img
-      image_dis = torchvision.utils.make_grid(model.image_display, nrow=model.image_display.size(0)//2)
+      image_dis = torchvision.utils.make_grid(model.image_display, nrow=model.image_display.size(0)//2)/2 + 0.5
       image_dis = np.transpose(image_dis.numpy(), (1, 2, 0)) * 255
       image_dis = image_dis.astype('uint8')
       self.writer.add_image('Image', image_dis, total_it)

@@ -142,28 +142,48 @@ class E_attr(nn.Module):
     super(E_attr, self).__init__()
     dim = 64
     self.model_a = nn.Sequential(
-        nn.Conv2d(input_dim_a, dim, 7, 1, 3),
+        nn.ReflectionPad2d(3),
+        nn.Conv2d(input_dim_a, dim, 7, 1),
+        #nn.Conv2d(input_dim_a, dim, 7, 1, 3),
         nn.ReLU(inplace=True),
-        nn.Conv2d(dim, dim*2, 4, 2, 1),
+        nn.ReflectionPad2d(1),
+        nn.Conv2d(dim, dim*2, 4, 2),
+        #nn.Conv2d(dim, dim*2, 4, 2, 1),
         nn.ReLU(inplace=True),
-        nn.Conv2d(dim*2, dim*4, 4, 2, 1),
+        nn.ReflectionPad2d(1),
+        nn.Conv2d(dim*2, dim*4, 4, 2),
+        #nn.Conv2d(dim*2, dim*4, 4, 2, 1),
         nn.ReLU(inplace=True),
-        nn.Conv2d(dim*4, dim*4, 4, 2, 1),
+        nn.ReflectionPad2d(1),
+        nn.Conv2d(dim*4, dim*4, 4, 2),
+        #nn.Conv2d(dim*4, dim*4, 4, 2, 1),
         nn.ReLU(inplace=True),
-        nn.Conv2d(dim*4, dim*4, 4, 2, 1),
+        nn.ReflectionPad2d(1),
+        nn.Conv2d(dim*4, dim*4, 4, 2),
+        #nn.Conv2d(dim*4, dim*4, 4, 2, 1),
         nn.ReLU(inplace=True),
         nn.AdaptiveAvgPool2d(1),
         nn.Conv2d(dim*4, output_nc, 1, 1, 0))
     self.model_b = nn.Sequential(
-        nn.Conv2d(input_dim_a, dim, 7, 1, 3),
+        nn.ReflectionPad2d(3),
+        nn.Conv2d(input_dim_a, dim, 7, 1),
+        #nn.Conv2d(input_dim_a, dim, 7, 1, 3),
         nn.ReLU(inplace=True),
-        nn.Conv2d(dim, dim*2, 4, 2, 1),
+        nn.ReflectionPad2d(1),
+        nn.Conv2d(dim, dim*2, 4, 2),
+        #nn.Conv2d(dim, dim*2, 4, 2, 1),
         nn.ReLU(inplace=True),
-        nn.Conv2d(dim*2, dim*4, 4, 2, 1),
+        nn.ReflectionPad2d(1),
+        nn.Conv2d(dim*2, dim*4, 4, 2),
+        #nn.Conv2d(dim*2, dim*4, 4, 2, 1),
         nn.ReLU(inplace=True),
-        nn.Conv2d(dim*4, dim*4, 4, 2, 1),
+        nn.ReflectionPad2d(1),
+        nn.Conv2d(dim*4, dim*4, 4, 2),
+        #nn.Conv2d(dim*4, dim*4, 4, 2, 1),
         nn.ReLU(inplace=True),
-        nn.Conv2d(dim*4, dim*4, 4, 2, 1),
+        nn.ReflectionPad2d(1),
+        nn.Conv2d(dim*4, dim*4, 4, 2),
+        #nn.Conv2d(dim*4, dim*4, 4, 2, 1),
         nn.ReLU(inplace=True),
         nn.AdaptiveAvgPool2d(1),
         nn.Conv2d(dim*4, output_nc, 1, 1, 0))
@@ -194,7 +214,9 @@ class E_attr_concat(nn.Module):
     n_blocks=4
     max_ndf = 4
 
-    conv_layers_A = [nn.Conv2d(input_dim_a, ndf, kernel_size=4, stride=2, padding=1, bias=True)]
+    conv_layers_A = [nn.ReflectionPad2d(1)]
+    conv_layers_A += [nn.Conv2d(input_dim_a, ndf, kernel_size=4, stride=2, padding=0, bias=True)]
+    #conv_layers_A += [nn.Conv2d(input_dim_a, ndf, kernel_size=4, stride=2, padding=1, bias=True)]
     for n in range(1, n_blocks):
       input_ndf = ndf * min(max_ndf, n)  # 2**(n-1)
       output_ndf = ndf * min(max_ndf, n+1)  # 2**n
@@ -204,7 +226,9 @@ class E_attr_concat(nn.Module):
     self.fcVar_A = nn.Sequential(*[nn.Linear(output_ndf, output_nc)])
     self.conv_A = nn.Sequential(*conv_layers_A)
 
-    conv_layers_B = [nn.Conv2d(input_dim_b, ndf, kernel_size=4, stride=2, padding=1, bias=True)]
+    conv_layers_B = [nn.ReflectionPad2d(1)]
+    conv_layers_B += [nn.Conv2d(input_dim_b, ndf, kernel_size=4, stride=2, padding=0, bias=True)]
+    #conv_layers_B += [nn.Conv2d(input_dim_b, ndf, kernel_size=4, stride=2, padding=1, bias=True)]
     for n in range(1, n_blocks):
       input_ndf = ndf * min(max_ndf, n)  # 2**(n-1)
       output_ndf = ndf * min(max_ndf, n+1)  # 2**n
@@ -411,7 +435,7 @@ def meanpoolConv(inplanes, outplanes):
 
 def convMeanpool(inplanes, outplanes):
   sequence = []
-  sequence += [conv3x3(inplanes, outplanes)]
+  sequence += conv3x3(inplanes, outplanes)
   sequence += [nn.AvgPool2d(kernel_size=2, stride=2)]
   return nn.Sequential(*sequence)
 
@@ -437,7 +461,8 @@ def get_non_linearity(layer_type='relu'):
     raise NotImplementedError('nonlinearity activitation [%s] is not found' % layer_type)
   return nl_layer
 def conv3x3(in_planes, out_planes):
-  return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=1, padding=1, bias=True)
+  return [nn.ReflectionPad2d(1), nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=1, padding=0, bias=True)]
+  #return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=1, padding=1, bias=True)
 
 def gaussian_weights_init(m):
   classname = m.__class__.__name__
@@ -465,11 +490,6 @@ class LayerNorm(nn.Module):
     shape = [-1] + [1]*(x.dim() - 1)
     mean = x.view(x.size(0), -1).mean(1).view(*shape)
     std = x.view(x.size(0), -1).std(1).view(*shape)
-    ## work for batch size = 1
-    #print(x.size())
-    #assert(x.size(0) == 1)
-    #mean = x.mean()
-    #std = x.std()
     x = (x - mean) / (std + self.eps)
     if self.affine:
       shape = [1, -1] + [1]*(x.dim() - 2)
@@ -483,7 +503,7 @@ class BasicBlock(nn.Module):
     if norm_layer is not None:
       layers += [norm_layer(inplanes)]
     layers += [nl_layer()]
-    layers += [conv3x3(inplanes, inplanes)]
+    layers += conv3x3(inplanes, inplanes)
     if norm_layer is not None:
       layers += [norm_layer(inplanes)]
     layers += [nl_layer()]
@@ -498,10 +518,13 @@ class LeakyReLUConv2d(nn.Module):
   def __init__(self, n_in, n_out, kernel_size, stride, padding=0, norm='None', sn=False):
     super(LeakyReLUConv2d, self).__init__()
     model = []
+    model += [nn.ReflectionPad2d(padding)]
     if sn:
-      model += [spectral_norm(nn.Conv2d(n_in, n_out, kernel_size=kernel_size, stride=stride, padding=padding, bias=True))]
+      model += [spectral_norm(nn.Conv2d(n_in, n_out, kernel_size=kernel_size, stride=stride, padding=0, bias=True))]
+      #model += [spectral_norm(nn.Conv2d(n_in, n_out, kernel_size=kernel_size, stride=stride, padding=padding, bias=True))]
     else:
-      model += [nn.Conv2d(n_in, n_out, kernel_size=kernel_size, stride=stride, padding=padding, bias=True)]
+      model += [nn.Conv2d(n_in, n_out, kernel_size=kernel_size, stride=stride, padding=0, bias=True)]
+      #model += [nn.Conv2d(n_in, n_out, kernel_size=kernel_size, stride=stride, padding=padding, bias=True)]
     if 'norm' == 'Instance':
       model += [nn.InstanceNorm2d(n_out, affine=False)]
     model += [nn.LeakyReLU(inplace=True)]
@@ -515,7 +538,9 @@ class ReLUINSConv2d(nn.Module):
   def __init__(self, n_in, n_out, kernel_size, stride, padding=0):
     super(ReLUINSConv2d, self).__init__()
     model = []
-    model += [nn.Conv2d(n_in, n_out, kernel_size=kernel_size, stride=stride, padding=padding, bias=True)]
+    model += [nn.ReflectionPad2d(padding)]
+    model += [nn.Conv2d(n_in, n_out, kernel_size=kernel_size, stride=stride, padding=0, bias=True)]
+    #model += [nn.Conv2d(n_in, n_out, kernel_size=kernel_size, stride=stride, padding=padding, bias=True)]
     model += [nn.InstanceNorm2d(n_out, affine=False)]
     model += [nn.ReLU(inplace=True)]
     self.model = nn.Sequential(*model)
@@ -525,14 +550,15 @@ class ReLUINSConv2d(nn.Module):
 
 class INSResBlock(nn.Module):
   def conv3x3(self, inplanes, out_planes, stride=1):
-    return nn.Conv2d(inplanes, out_planes, kernel_size=3, stride=stride, padding=1)
+    return [nn.ReflectionPad2d(1), nn.Conv2d(inplanes, out_planes, kernel_size=3, stride=stride)]
+    #return nn.Conv2d(inplanes, out_planes, kernel_size=3, stride=stride, padding=1)
   def __init__(self, inplanes, planes, stride=1, dropout=0.0):
     super(INSResBlock, self).__init__()
     model = []
-    model += [self.conv3x3(inplanes, planes, stride)]
+    model += self.conv3x3(inplanes, planes, stride)
     model += [nn.InstanceNorm2d(planes)]
     model += [nn.ReLU(inplace=True)]
-    model += [self.conv3x3(planes, planes)]
+    model += self.conv3x3(planes, planes)
     model += [nn.InstanceNorm2d(planes)]
     if dropout > 0:
       model += [nn.Dropout(p=dropout)]
@@ -546,7 +572,8 @@ class INSResBlock(nn.Module):
 
 class MisINSResBlock(nn.Module):
   def conv3x3(self, dim_in, dim_out, stride=1):
-    return nn.Conv2d(dim_in, dim_out, kernel_size=3, stride=stride, padding=1)
+    return nn.Sequential(nn.ReflectionPad2d(1), nn.Conv2d(dim_in, dim_out, kernel_size=3, stride=stride))
+    #return nn.Conv2d(dim_in, dim_out, kernel_size=3, stride=stride, padding=1)
   def conv1x1(self, dim_in, dim_out):
     return nn.Conv2d(dim_in, dim_out, kernel_size=1, stride=1, padding=0)
   def __init__(self, dim, dim_extra, stride=1, dropout=0.0):
@@ -599,6 +626,8 @@ class ReLUINSConvTranspose2d(nn.Module):
   def __init__(self, n_in, n_out, kernel_size, stride, padding, output_padding):
     super(ReLUINSConvTranspose2d, self).__init__()
     model = []
+    #model += [nn.ReflectionPad2d(kernel_size - 1 - padding)]
+    #model += [nn.ConvTranspose2d(n_in, n_out, kernel_size=kernel_size, stride=stride, padding=kernel_size-1, output_padding=output_padding, bias=True)]
     model += [nn.ConvTranspose2d(n_in, n_out, kernel_size=kernel_size, stride=stride, padding=padding, output_padding=output_padding, bias=True)]
     model += [LayerNorm(n_out)]
     model += [nn.ReLU(inplace=True)]
