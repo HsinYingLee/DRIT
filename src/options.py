@@ -28,7 +28,7 @@ class TrainOptions():
     self.parser.add_argument('--concat', type=int, default=1, help='concatenate attribute features for translation')
     self.parser.add_argument('--dis_scale', type=int, default=3, help='scale of discriminator')
     self.parser.add_argument('--dis_norm', type=str, default='None', help='normalization layer in discriminator [None, Instance]')
-    self.parser.add_argument('--dis_spectral_norm', type=int, default=0, help='use spectral normalization in discriminator')
+    self.parser.add_argument('--dis_spectral_norm', actrion='store_true', help='use spectral normalization in discriminator')
     self.parser.add_argument('--lr_policy', type=str, default='lambda', help='type of learn rate decay')
     self.parser.add_argument('--n_ep', type=int, default=1200, help='number of epochs') # 400 * d_iter
     self.parser.add_argument('--n_ep_decay', type=int, default=600, help='epoch start decay learning rate, set -1 if no decay') # 200 * d_iter
@@ -77,5 +77,5 @@ class TestOptions():
     # set irrelevant options
     self.opt.dis_scale = 3
     self.opt.dis_norm = 'None'
-    self.opt.dis_spectral_norm = 0
+    self.opt.dis_spectral_norm = False
     return self.opt

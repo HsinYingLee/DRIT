@@ -48,8 +48,8 @@ cd DRIT/src
 ```
 bash ./datasets/download_dataset.sh dataset_name
 ```
-- Portrait (photography <-> painting): 6452 photography images from [CelebA dataset](http://mmlab.ie.cuhk.edu.hk/projects/CelebA.html), 1811 painting images downloaded and cropped from [Wikiart](https://www.wikiart.org/).
-- Cat <-> dog: 871 cat (birman) images, 1364 dog (husky, samoyed) images crawled and cropped from Google Images.
+- Portrait: 6452 photography images from [CelebA dataset](http://mmlab.ie.cuhk.edu.hk/projects/CelebA.html), 1811 painting images downloaded and cropped from [Wikiart](https://www.wikiart.org/).
+- Cat2dog: 871 cat (birman) images, 1364 dog (husky, samoyed) images crawled and cropped from Google Images.
 - You can follow the instructions in CycleGAN [website](https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix) to download the Yosemite (winter, summer) dataset and artworks (monet, van Gogh) dataset. For photo <-> artrwork translation, we use the summer images in Yosemite dataset as the photo images.
 
 ## Training Examples
