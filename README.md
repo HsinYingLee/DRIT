@@ -3,7 +3,7 @@
 <img src='imgs/emma2portrait.gif' width=384>
 
 # Diverse Image-to-Image Translation via Disentangled Representations
-[[Project Page]]()[[Paper]]()
+[[Project Page]](http://vllab.ucmerced.edu/hylee/DRIT/)[[Paper]]()
 
 Pytorch implementation for our diverse image-to-image translation method. With the proposed disentangled representation approach, we are able to produce diverse translation results without paired training images.
 
