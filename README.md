@@ -3,7 +3,7 @@
 <img src='imgs/emma2portrait.gif' width=384>
 
 # Diverse Image-to-Image Translation via Disentangled Representations
-[[Project Page]]()[[Paper]]()
+[[Project Page]](http://vllab.ucmerced.edu/hylee/DRIT/)[[Paper]]()
 
 Pytorch implementation for our diverse image-to-image translation method. With the proposed disentangled representation approach, we are able to produce diverse translation results without paired training images.
 
@@ -88,8 +88,10 @@ Results can be found at `../outputs/yosemite`.
 
 - We provide two different methods for combining content representation and attribute vector. One is simple concatenation, the other is feature-wise transformation (learn to scale and bias features). In our experience, if the translation involves less shape variation (e.g. Winter2Summer), simple concatenation produces better results. On the other hand, the translation with shape variation (e.g. cat2dog, celeb2portrait), feature-wise transformation should be used (i.e. set --concat 0) in order to generate diverse results.
 
-- In our experience, using the multiscale discriminator also always gets better results. You can set the number of scales manually with "--dis_scale".
+- In our experience, using the multiscale discriminator almost also always gets better results. You can set the number of scales manually with "--dis_scale".
 
-- We also provide option "--dis_spectral_norm" for using spectral normalization(https://arxiv.org/abs/1802.05957). We use the code from the master branch of pytorch since pytorch 0.5.0 is not stable yet. However, despite using spectral normalization significantly stabilizes the training, we fail to observe consistent quality improvement. We encourage everyone to play around with various settings and explore better configurations.
+- There is a hyper-parameter d_iter which controls the training schedule of the content discriminator. The default value is d_iter = 3, yet the model can still generate diverse results with d_iter = 1. Set --d_iter=1 if you would like to save some training time. 
 
-- Since the log file will be large if you want to display the images, set "--no_img_display" if you like to display only the loss values.
+- We also provide option "--dis_spectral_norm" for using spectral normalization (https://arxiv.org/abs/1802.05957). We use the code from the master branch of pytorch since pytorch 0.5.0 is not stable yet. However, despite using spectral normalization significantly stabilizes the training, we fail to observe consistent quality improvement. We encourage everyone to play around with various settings and explore better configurations.
+
+- Since the log file will be large if you want to display the images on tensorboard, set "--no_img_display" if you like to display only the loss values.
