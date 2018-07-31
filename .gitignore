@@ -3,7 +3,6 @@
 *.pth
 *.pyc
 debug*
-datasets/
 videos/
 build/
 dist/
