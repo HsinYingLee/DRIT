@@ -16,8 +16,8 @@ European Conference on Computer Vision (ECCV), 2018 (**oral**) (* equal contribu
 
 Please cite our paper if you find it useful for your research.
 ```
-@inproceedings{lee_drit_2018,
-  author = {Lee, Hsin-Ying. and Tseng, Hung-Yu and Singh, Maneesh Kumar and Huang, Jia-Bin and Yang, Ming-Hsuan},
+@inproceedings{DRIT,
+  author = {Lee, Hsin-Ying. and Tseng, Hung-Yu and Huang, Jia-Bin and Singh, Maneesh Kumar and Yang, Ming-Hsuan},
   booktitle = {European Conference on Computer Vision (ECCV)},
   title = {Diverse Image-to-Image Translation via Disentangled Representations},
   year = {2018}
@@ -43,11 +43,13 @@ git clone https://github.com/HsinYingLee/DRIT.git
 cd DRIT/src
 ```
 
-## Dataset
-- Download the photo <-> portrait dataset using following script.
+## Datasets
+- Download the dataset using the following script.
 ```
-bash ./datasets/download_photo2portrait.sh
+bash ./datasets/download_dataset.sh name
 ```
+- Photo2portait: 6452 photo images from [CelebA dataset](http://mmlab.ie.cuhk.edu.hk/projects/CelebA.html), 1811 portrait images downloaded and cropped from [Wikiart](https://www.wikiart.org/).
+- Cat2dog: 871 cat (birman) images, 1364 dog (husky, samoyed) images crawled and cropped from Google Images.
 - You can follow the instructions in CycleGAN [website](https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix) to download the Yosemite (winter, summer) dataset and artworks (monet, van Gogh) dataset. For photo <-> artrwork translation, we use the summer images in Yosemite dataset as the photo images.
 
 ## Training Examples
