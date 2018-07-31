@@ -18,7 +18,7 @@ Please cite our paper if you find it useful for your research.
 ```
 @inproceedings{DRIT,
   author = {Lee, Hsin-Ying. and Tseng, Hung-Yu and Huang, Jia-Bin and Singh, Maneesh Kumar and Yang, Ming-Hsuan},
-  booktitle = {European Conference on Computer Vision (ECCV)},
+  booktitle = {European Conference on Computer Vision},
   title = {Diverse Image-to-Image Translation via Disentangled Representations},
   year = {2018}
 }
