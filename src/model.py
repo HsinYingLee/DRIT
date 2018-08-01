@@ -174,10 +174,6 @@ class DRIT(nn.Module):
     self.fake_B_recon = self.gen.forward_b(self.z_content_recon_b, self.z_attr_recon_b)
 
     # for display
-    '''self.image_display = torch.cat((self.real_A_encoded[0:1].data.cpu(), self.fake_B_encoded[0:1].data.cpu(), \
-                                    self.fake_B_random[0:1].data.cpu(), self.fake_AA_encoded[0:1].data.cpu(), self.fake_A_recon[0:1].data.cpu(), \
-                                    self.real_B_encoded[0:1].data.cpu(), self.fake_A_encoded[0:1].data.cpu(), \
-                                    self.fake_A_random[0:1].data.cpu(), self.fake_BB_encoded[0:1].data.cpu(), self.fake_B_recon[0:1].data.cpu()), dim=0)'''
     self.image_display = torch.cat((self.real_A_encoded[0:1].detach().cpu(), self.fake_B_encoded[0:1].detach().cpu(), \
                                     self.fake_B_random[0:1].detach().cpu(), self.fake_AA_encoded[0:1].detach().cpu(), self.fake_A_recon[0:1].detach().cpu(), \
                                     self.real_B_encoded[0:1].detach().cpu(), self.fake_A_encoded[0:1].detach().cpu(), \
@@ -202,7 +198,6 @@ class DRIT(nn.Module):
     self.forward_content()
     self.disContent_opt.zero_grad()
     loss_D_Content = self.backward_contentD(self.z_content_a, self.z_content_b)
-    #self.disContent_loss = loss_D_Content.data.cpu().numpy()
     self.disContent_loss = loss_D_Content.item()
     nn.utils.clip_grad_norm_(self.disContent.parameters(), 5)
     self.disContent_opt.step()
@@ -215,35 +210,30 @@ class DRIT(nn.Module):
     # update disA
     self.disA_opt.zero_grad()
     loss_D1_A = self.backward_D(self.disA, self.real_A_encoded, self.fake_A_encoded)
-    #self.disA_loss = loss_D1_A.data.cpu().numpy()
     self.disA_loss = loss_D1_A.item()
     self.disA_opt.step()
 
     # update disA2
     self.disA2_opt.zero_grad()
     loss_D2_A = self.backward_D(self.disA2, self.real_A_random, self.fake_A_random)
-    #self.disA2_loss = loss_D2_A.data.cpu().numpy()
     self.disA2_loss = loss_D2_A.item()
     self.disA2_opt.step()
 
     # update disB
     self.disB_opt.zero_grad()
     loss_D1_B = self.backward_D(self.disB, self.real_B_encoded, self.fake_B_encoded)
-    #self.disB_loss = loss_D1_B.data.cpu().numpy()
     self.disB_loss = loss_D1_B.item()
     self.disB_opt.step()
 
     # update disB2
     self.disB2_opt.zero_grad()
     loss_D2_B = self.backward_D(self.disB2, self.real_B_random, self.fake_B_random)
-    #self.disB2_loss = loss_D2_B.data.cpu().numpy()
     self.disB2_loss = loss_D2_B.item()
     self.disB2_opt.step()
 
     # update disContent
     self.disContent_opt.zero_grad()
     loss_D_Content = self.backward_contentD(self.z_content_a, self.z_content_b)
-    #self.disContent_loss = loss_D_Content.data.cpu().numpy()
     self.disContent_loss = loss_D_Content.item()
     nn.utils.clip_grad_norm_(self.disContent.parameters(), 5)
     self.disContent_opt.step()
@@ -332,19 +322,6 @@ class DRIT(nn.Module):
 
     loss_G.backward(retain_graph=True)
 
-    '''self.gan_loss_a = loss_G_GAN_A.data.cpu().numpy()
-    self.gan_loss_b = loss_G_GAN_B.data.cpu().numpy()
-    self.gan_loss_acontent = loss_G_GAN_Acontent.data.cpu().numpy()
-    self.gan_loss_bcontent = loss_G_GAN_Bcontent.data.cpu().numpy()
-    self.kl_loss_za_a = loss_kl_za_a.data.cpu().numpy()
-    self.kl_loss_za_b = loss_kl_za_b.data.cpu().numpy()
-    self.kl_loss_zc_a = loss_kl_zc_a.data.cpu().numpy()
-    self.kl_loss_zc_b = loss_kl_zc_b.data.cpu().numpy()
-    self.l1_recon_A_loss = loss_G_L1_A.data.cpu().numpy()
-    self.l1_recon_B_loss = loss_G_L1_B.data.cpu().numpy()
-    self.l1_recon_AA_loss = loss_G_L1_AA.data.cpu().numpy()
-    self.l1_recon_BB_loss = loss_G_L1_BB.data.cpu().numpy()
-    self.G_loss = loss_G.data.cpu().numpy()'''
     self.gan_loss_a = loss_G_GAN_A.item()
     self.gan_loss_b = loss_G_GAN_B.item()
     self.gan_loss_acontent = loss_G_GAN_Acontent.item()
@@ -391,10 +368,6 @@ class DRIT(nn.Module):
 
     loss_z_L1 = loss_z_L1_a + loss_z_L1_b + loss_G_GAN2_A + loss_G_GAN2_B
     loss_z_L1.backward()
-    '''self.l1_recon_z_loss_a = loss_z_L1_a.item()
-    self.l1_recon_z_loss_b = loss_z_L1_b.item()
-    self.gan2_loss_a = loss_G_GAN2_A.item()
-    self.gan2_loss_b = loss_G_GAN2_B.item()'''
     self.l1_recon_z_loss_a = loss_z_L1_a.item()
     self.l1_recon_z_loss_b = loss_z_L1_b.item()
     self.gan2_loss_a = loss_G_GAN2_A.item()

@@ -20,12 +20,12 @@ class TrainOptions():
     self.parser.add_argument('--display_dir', type=str, default='../logs', help='path for saveing display results')
     self.parser.add_argument('--result_dir', type=str, default='../results', help='path for saving result images and models')
     self.parser.add_argument('--display_freq', type=int, default=1, help='freq (iteration) of display')
-    self.parser.add_argument('--img_save_freq', type=int, default=50, help='freq (epoch) of saving images')
+    self.parser.add_argument('--img_save_freq', type=int, default=5, help='freq (epoch) of saving images')
     self.parser.add_argument('--model_save_freq', type=int, default=10, help='freq (epoch) of saving models')
     self.parser.add_argument('--no_display_img', action='store_true', help='specified if no dispaly')
 
     # training related
-    self.parser.add_argument('--concat', type=int, default=1, help='concatenate attribute features for translation')
+    self.parser.add_argument('--concat', type=int, default=1, help='concatenate attribute features for translation, set 0 for using feature-wise transform')
     self.parser.add_argument('--dis_scale', type=int, default=3, help='scale of discriminator')
     self.parser.add_argument('--dis_norm', type=str, default='None', help='normalization layer in discriminator [None, Instance]')
     self.parser.add_argument('--dis_spectral_norm', action='store_true', help='use spectral normalization in discriminator')
@@ -64,7 +64,7 @@ class TestOptions():
     self.parser.add_argument('--result_dir', type=str, default='../outputs', help='path for saving result images and models')
 
     # model related
-    self.parser.add_argument('--concat', type=int, default=1, help='concatenate attribute features for translation')
+    self.parser.add_argument('--concat', type=int, default=1, help='concatenate attribute features for translation, set 0 for using feature-wise transform')
     self.parser.add_argument('--resume', type=str, required=True, help='specified the dir of saved models for resume the training')
     self.parser.add_argument('--gpu', type=int, default=0, help='gpu')
 
