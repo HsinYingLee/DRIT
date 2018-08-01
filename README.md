@@ -5,7 +5,7 @@
 # Diverse Image-to-Image Translation via Disentangled Representations
 [[Project Page]](http://vllab.ucmerced.edu/hylee/DRIT/)[[Paper]]()
 
-Pytorch implementation for our diverse image-to-image translation method. With the proposed disentangled representation approach, we are able to produce diverse translation results without paired training images.
+Pytorch implementation for our diverse image-to-image translation method. With the proposed disentangled representation learning approach, we are able to produce diverse translation results without paired training images.
 
 Contact: Hsin-Ying Lee (hlee246@ucmerced.edu) and Hung-Yu Tseng (htseng6@ucmerced.edu)
 
@@ -14,7 +14,7 @@ Diverse Image-to-Image Translation via Disentangled Representations<br>
 [Hsin-Ying Lee](http://vllab.ucmerced.edu/hylee/)\*, [Hung-Yu Tseng](https://sites.google.com/site/hytseng0509/)\*, [Jia-Bin Huang](https://filebox.ece.vt.edu/~jbhuang/), [Maneesh Kumar Singh](https://scholar.google.com/citations?user=hdQhiFgAAAAJ), and [Ming-Hsuan Yang](http://faculty.ucmerced.edu/mhyang/)<br>
 European Conference on Computer Vision (ECCV), 2018 (**oral**) (* equal contribution)
 
-Please cite our paper if you find it useful for your research.
+Please cite our paper if you find the code or dataset useful for your research.
 ```
 @inproceedings{DRIT,
   author = {Lee, Hsin-Ying. and Tseng, Hung-Yu and Huang, Jia-Bin and Singh, Maneesh Kumar and Yang, Ming-Hsuan},
