@@ -44,7 +44,7 @@ def main():
       images_b = images_b.cuda(opts.gpu).detach()
 
       # update model
-      if (it + 1) % opts.d_iter != 0:
+      if (it + 1) % opts.d_iter != 0 and not it == len(train_loader)-1:
         model.update_D_content(images_a, images_b)
         continue
       else:
