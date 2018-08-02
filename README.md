@@ -1,6 +1,6 @@
 ![Python 3.5](https://img.shields.io/badge/python-3.5-green.svg) ![Python 3.6](https://img.shields.io/badge/python-3.6-green.svg)
 
-<img src='imgs/emma_final_1.gif' width=384 hspace=20> <img src='imgs/emma_final_2.gif' width=384>
+<img src='imgs/hyl.gif' width=384 hspace=20> <img src='imgs/hyt.gif' width=384> <img src='imgs/jb1.gif' width=384>
 
 # Diverse Image-to-Image Translation via Disentangled Representations
 [[Project Page]](http://vllab.ucmerced.edu/hylee/DRIT/)[[Paper]]()
