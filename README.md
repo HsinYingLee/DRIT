@@ -36,7 +36,7 @@ Please cite our paper if you find the code or dataset useful for your research.
 - Pytorch 4.0 and torchvision (https://pytorch.org/)
 - [TensorboardX](https://github.com/lanpa/tensorboard-pytorch)
 - [Tensorflow](https://www.tensorflow.org/) (for tensorboard usage)
-- We provide a Docker file for building the environment based on CUDA 9.0 and CuDNN 7.1.
+- We provide a Docker file for building the environment based on CUDA 9.0, CuDNN 7.1 and Ubuntu 16.04.
 
 ### Install
 - Clone this repo:
@@ -48,7 +48,7 @@ cd DRIT/src
 ## Datasets
 - Download the dataset using the following script.
 ```
-bash ./datasets/download_dataset.sh dataset_name
+bash ../datasets/download_dataset.sh dataset_name
 ```
 - Portrait: 6452 photography images from [CelebA dataset](http://mmlab.ie.cuhk.edu.hk/projects/CelebA.html), 1811 painting images downloaded and cropped from [Wikiart](https://www.wikiart.org/).
 - Cat2dog: 871 cat (birman) images, 1364 dog (husky, samoyed) images crawled and cropped from Google Images.
@@ -72,19 +72,19 @@ Results and saved models can be found at `../results/portrait`.
 ## Testing Example
 - Download a pre-trained model (We will upload the latest models in a few days)
 ```
-bash ./models/download_model.sh
+bash ../models/download_model.sh
 ```
 - Generate results with randomly sampled attributes
   - Require folder `testA` (for a2b) or `testB` (for b2a) under dataroot
 ```
-python3 test.py --dataroot ../datasets/yosemite --name yosemite_random --resume ../models/example.pth --a2b 0
+python3 test.py --dataroot ../datasets/yosemite --name yosemite_random --resume ../models/example.pth
 ```
 Diverse generated summer images can be found at `../outputs/yosemite_random`
 
 - Generate results with attributes encoded from given images
   - Require both folders `testA` and `testB` under dataroot
 ```
-python3 test_transfer.py --dataroot ../datasets/yosemite --name yosemite_encoded --resume ../models/example.pth --a2b 0
+python3 test_transfer.py --dataroot ../datasets/yosemite --name yosemite_encoded --resume ../models/example.pth
 ```
 Diverse generated summer images can be found at `../outputs/yosemite_encoded`
 
