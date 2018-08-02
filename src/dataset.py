@@ -13,7 +13,7 @@ class dataset_single(data.Dataset):
     self.input_dim = input_dim
 
     # setup image transformation
-    transforms = [Resize(opts.resize_size, Image.BICUBIC)]
+    transforms = [Resize((opts.resize_size, opts.resize_size), Image.BICUBIC)]
     transforms.append(CenterCrop(opts.crop_size))
     transforms.append(ToTensor())
     transforms.append(Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]))
@@ -55,7 +55,7 @@ class dataset_unpair(data.Dataset):
     self.input_dim_B = opts.input_dim_b
 
     # setup image transformation
-    transforms = [Resize(opts.resize_size, Image.BICUBIC)]
+    transforms = [Resize((opts.resize_size, opts.resize_size), Image.BICUBIC)]
     if opts.phase == 'train':
       transforms.append(RandomCrop(opts.crop_size))
     else:

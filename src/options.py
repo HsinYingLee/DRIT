@@ -5,19 +5,19 @@ class TrainOptions():
     self.parser = argparse.ArgumentParser()
 
     # data loader related
-    self.parser.add_argument('--dataroot', type=str, required=True, help='path of training data list, should contain data lists for both domains')
+    self.parser.add_argument('--dataroot', type=str, required=True, help='path of data')
     self.parser.add_argument('--phase', type=str, default='train', help='phase for dataloading')
     self.parser.add_argument('--batch_size', type=int, default=2, help='batch size')
     self.parser.add_argument('--resize_size', type=int, default=256, help='resized image size for training')
     self.parser.add_argument('--crop_size', type=int, default=216, help='cropped image size for training')
     self.parser.add_argument('--input_dim_a', type=int, default=3, help='# of input channels for domain A')
     self.parser.add_argument('--input_dim_b', type=int, default=3, help='# of input channels for domain B')
-    self.parser.add_argument('--nThreads', type=int, default=8, help='for data loader')
+    self.parser.add_argument('--nThreads', type=int, default=8, help='# of threads for data loader')
     self.parser.add_argument('--no_flip', action='store_true', help='specified if no flipping')
 
     # ouptput related
     self.parser.add_argument('--name', type=str, default='trial', help='folder name to save outputs')
-    self.parser.add_argument('--display_dir', type=str, default='../logs', help='path for saveing display results')
+    self.parser.add_argument('--display_dir', type=str, default='../logs', help='path for saving display results')
     self.parser.add_argument('--result_dir', type=str, default='../results', help='path for saving result images and models')
     self.parser.add_argument('--display_freq', type=int, default=1, help='freq (iteration) of display')
     self.parser.add_argument('--img_save_freq', type=int, default=5, help='freq (epoch) of saving images')
@@ -49,7 +49,7 @@ class TestOptions():
     self.parser = argparse.ArgumentParser()
 
     # data loader related
-    self.parser.add_argument('--dataroot', type=str, required=True, help='path of training data list,   should contain data lists for both domains')
+    self.parser.add_argument('--dataroot', type=str, required=True, help='path of data')
     self.parser.add_argument('--phase', type=str, default='test', help='phase for dataloading')
     self.parser.add_argument('--resize_size', type=int, default=256, help='resized image size for training')
     self.parser.add_argument('--crop_size', type=int, default=216, help='cropped image size for training')
