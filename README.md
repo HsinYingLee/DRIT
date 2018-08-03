@@ -1,6 +1,6 @@
 ![Python 3.5](https://img.shields.io/badge/python-3.5-green.svg) ![Python 3.6](https://img.shields.io/badge/python-3.6-green.svg)
 
-<img src='imgs/author.git' width="900px">
+<img src='imgs/author.gif' width="900px">
 
 # Diverse Image-to-Image Translation via Disentangled Representations
 [[Project Page]](http://vllab.ucmerced.edu/hylee/DRIT/)[[Paper]](https://arxiv.org/abs/1808.00948)
