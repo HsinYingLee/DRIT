@@ -7,7 +7,7 @@
 # Diverse Image-to-Image Translation via Disentangled Representations
 [[Project Page]](http://vllab.ucmerced.edu/hylee/DRIT/)[[Paper]]()
 
-Pytorch implementation for our diverse image-to-image translation method. With the proposed disentangled representation learning approach, we are able to produce diverse translation results without paired training images.
+Pytorch implementation for our image-to-image translation method. With the proposed disentangled representation framework, we are able to learn **diverse** image-to-image translation from **unpaired** training data.
 
 Contact: Hsin-Ying Lee (hlee246@ucmerced.edu) and Hung-Yu Tseng (htseng6@ucmerced.edu)
 
@@ -36,7 +36,7 @@ Please cite our paper if you find the code or dataset useful for your research.
 - Pytorch 4.0 and torchvision (https://pytorch.org/)
 - [TensorboardX](https://github.com/lanpa/tensorboard-pytorch)
 - [Tensorflow](https://www.tensorflow.org/) (for tensorboard usage)
-- We provide a Docker file for building the environment based on CUDA 9.0, CuDNN 7.1 and Ubuntu 16.04.
+- We provide a Docker file for building the environment based on CUDA 9.0, CuDNN 7.1, and Ubuntu 16.04.
 
 ### Install
 - Clone this repo:
@@ -50,8 +50,8 @@ cd DRIT/src
 ```
 bash ../datasets/download_dataset.sh dataset_name
 ```
-- Portrait: 6452 photography images from [CelebA dataset](http://mmlab.ie.cuhk.edu.hk/projects/CelebA.html), 1811 painting images downloaded and cropped from [Wikiart](https://www.wikiart.org/).
-- Cat2dog: 871 cat (birman) images, 1364 dog (husky, samoyed) images crawled and cropped from Google Images.
+- portrait: 6452 photography images from [CelebA dataset](http://mmlab.ie.cuhk.edu.hk/projects/CelebA.html), 1811 painting images downloaded and cropped from [Wikiart](https://www.wikiart.org/).
+- cat2dog: 871 cat (birman) images, 1364 dog (husky, samoyed) images crawled and cropped from Google Images.
 - You can follow the instructions in CycleGAN [website](https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix) to download the Yosemite (winter, summer) dataset and artworks (monet, van Gogh) dataset. For photo <-> artrwork translation, we use the summer images in Yosemite dataset as the photo images.
 
 ## Training Examples
