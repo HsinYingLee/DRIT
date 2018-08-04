@@ -483,6 +483,22 @@ class LayerNorm(nn.Module):
       x = x*self.gamma.view(*shape) + self.beta.view(*shape)
     return x
 
+'''class LayerNorm(nn.Module):
+  def __init__(self, n_out, eps=1e-5, affine=True):
+    super(LayerNorm, self).__init__()
+    self.n_out = n_out
+    self.affine = affine
+    if self.affine:
+      self.weight = nn.Parameter(torch.ones(n_out, 1, 1))
+      self.bias = nn.Parameter(torch.zeros(n_out, 1, 1))
+    return
+  def forward(self, x):
+    normalized_shape = x.size()[1:]
+    if self.affine:
+      return F.layer_norm(x, normalized_shape, self.weight.expand(normalized_shape), self.bias.expand(normalized_shape))
+    else:
+      return F.layer_norm(x, normalized_shape)'''
+
 class BasicBlock(nn.Module):
   def __init__(self, inplanes, outplanes, norm_layer=None, nl_layer=None):
     super(BasicBlock, self).__init__()
