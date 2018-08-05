@@ -460,30 +460,8 @@ def gaussian_weights_init(m):
 #-------------------------- Basic Blocks --------------------------
 ####################################################################
 
-## The code of LayerNorm is copied from MUNIT (https://github.com/NVlabs/MUNIT)
-## pytorch 0.4.0 already supports LayerNorm
-## We will incorporate the built-in LayerNorm function in the future
+## The code of LayerNorm is modified from MUNIT (https://github.com/NVlabs/MUNIT)
 class LayerNorm(nn.Module):
-  def __init__(self, n_out, eps=1e-5, affine=True):
-    super(LayerNorm, self).__init__()
-    self.n_out = n_out
-    self.affine = affine
-    self.eps = eps
-    if self.affine:
-      self.gamma = nn.Parameter(torch.Tensor(n_out).uniform_())
-      self.beta = nn.Parameter(torch.zeros(n_out))
-    return
-  def forward(self, x):
-    shape = [-1] + [1]*(x.dim() - 1)
-    mean = x.view(x.size(0), -1).mean(1).view(*shape)
-    std = x.view(x.size(0), -1).std(1).view(*shape)
-    x = (x - mean) / (std + self.eps)
-    if self.affine:
-      shape = [1, -1] + [1]*(x.dim() - 2)
-      x = x*self.gamma.view(*shape) + self.beta.view(*shape)
-    return x
-
-'''class LayerNorm(nn.Module):
   def __init__(self, n_out, eps=1e-5, affine=True):
     super(LayerNorm, self).__init__()
     self.n_out = n_out
@@ -497,7 +475,7 @@ class LayerNorm(nn.Module):
     if self.affine:
       return F.layer_norm(x, normalized_shape, self.weight.expand(normalized_shape), self.bias.expand(normalized_shape))
     else:
-      return F.layer_norm(x, normalized_shape)'''
+      return F.layer_norm(x, normalized_shape)
 
 class BasicBlock(nn.Module):
   def __init__(self, inplanes, outplanes, norm_layer=None, nl_layer=None):

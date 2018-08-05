@@ -77,14 +77,14 @@ bash ../models/download_model.sh
 ```
 python3 test.py --dataroot ../datasets/yosemite --name yosemite_random --resume ../models/example.pth
 ```
-Diverse generated summer images can be found at `../outputs/yosemite_random`
+Diverse generated winter images can be found at `../outputs/yosemite_random`
 
 - Generate results with attributes encoded from given images
   - Require both folders `testA` and `testB` under dataroot
 ```
 python3 test_transfer.py --dataroot ../datasets/yosemite --name yosemite_encoded --resume ../models/example.pth
 ```
-Diverse generated summer images can be found at `../outputs/yosemite_encoded`
+Diverse generated winter images can be found at `../outputs/yosemite_encoded`
 
 ## Training options and tips
 - Due to the usage of adaptive pooling for attribute encoders, our model supports various input size. For example, here's the result of Grayscale -> RGB using 340x340 images.
