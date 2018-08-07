@@ -31,7 +31,7 @@ Please cite our paper if you find the code or dataset useful for your research.
 
 ### Prerequisites
 - Python 3.5 or Python 3.6
-- Pytorch 4.0 and torchvision (https://pytorch.org/)
+- Pytorch 0.4.0 and torchvision (https://pytorch.org/)
 - [TensorboardX](https://github.com/lanpa/tensorboard-pytorch)
 - [Tensorflow](https://www.tensorflow.org/) (for tensorboard usage)
 - We provide a Docker file for building the environment based on CUDA 9.0, CuDNN 7.1, and Ubuntu 16.04.
