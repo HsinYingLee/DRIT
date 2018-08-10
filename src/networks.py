@@ -161,7 +161,7 @@ class E_attr(nn.Module):
         nn.Conv2d(dim*4, output_nc, 1, 1, 0))
     self.model_b = nn.Sequential(
         nn.ReflectionPad2d(3),
-        nn.Conv2d(input_dim_a, dim, 7, 1),
+        nn.Conv2d(input_dim_b, dim, 7, 1),
         nn.ReLU(inplace=True),
         nn.ReflectionPad2d(1),
         nn.Conv2d(dim, dim*2, 4, 2),
