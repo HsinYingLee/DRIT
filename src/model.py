@@ -84,8 +84,7 @@ class DRIT(nn.Module):
     self.gen.cuda(self.gpu)
 
   def get_z_random(self, batchSize, nz, random_type='gauss'):
-    z = torch.cuda.FloatTensor(batchSize, nz)
-    z.copy_(torch.randn(batchSize, nz))
+    z = torch.randn(batchSize, nz).cuda(self.gpu)
     return z
 
   def test_forward(self, image, a2b=True):
@@ -106,7 +105,7 @@ class DRIT(nn.Module):
       eps = self.get_z_random(std_a.size(0), std_a.size(1), 'gauss')
       self.z_attr_a = eps.mul(std_a).add_(self.mu_a)
       std_b = self.logvar_b.mul(0.5).exp_()
-      eps = self.get_z_random(std_a.size(0), std_a.size(1), 'gauss')
+      eps = self.get_z_random(std_b.size(0), std_b.size(1), 'gauss')
       self.z_attr_b = eps.mul(std_b).add_(self.mu_b)
     else:
       self.z_attr_a, self.z_attr_b = self.enc_a.forward(image_a, image_b)
