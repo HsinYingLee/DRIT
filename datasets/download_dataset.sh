@@ -1,6 +1,6 @@
 DATASET=$1
 
-if [[$DATASET != "Portrait" && $DATASET != "Cat2Dog"]]; then
+if [[$DATASET != "portrait" && $DATASET != "cat2dog"]]; then
   echo "dataset not available"
   exit
 fi
