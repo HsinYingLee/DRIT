@@ -299,12 +299,12 @@ class DRIT(nn.Module):
       kl_element_b = self.mu_b.pow(2).add_(self.logvar_b.exp()).mul_(-1).add_(1).add_(self.logvar_b)
       loss_kl_za_b = torch.sum(kl_element_b).mul_(-0.5) * 0.01
     else:
-      loss_kl_za_a = self._compute_kl(self.z_attr_a) * 0.01
-      loss_kl_za_b = self._compute_kl(self.z_attr_b) * 0.01
+      loss_kl_za_a = self._l2_regularize(self.z_attr_a) * 0.01
+      loss_kl_za_b = self._l2_regularize(self.z_attr_b) * 0.01
 
     # KL loss - z_c
-    loss_kl_zc_a = self._compute_kl(self.z_content_a) * 0.01
-    loss_kl_zc_b = self._compute_kl(self.z_content_b) * 0.01
+    loss_kl_zc_a = self._l2_regularize(self.z_content_a) * 0.01
+    loss_kl_zc_b = self._l2_regularize(self.z_content_b) * 0.01
 
     # cross cycle consistency loss
     loss_G_L1_A = self.criterionL1(self.fake_A_recon, self.real_A_encoded) * 10
@@ -382,7 +382,7 @@ class DRIT(nn.Module):
     self.enc_a_sch.step()
     self.gen_sch.step()
 
-  def _compute_kl(self, mu):
+  def _l2_regularize(self, mu):
     mu_2 = torch.pow(mu, 2)
     encoding_loss = torch.mean(mu_2)
     return encoding_loss
