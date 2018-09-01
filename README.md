@@ -99,3 +99,6 @@ Diverse generated winter images can be found at `../outputs/yosemite_encoded`
 - We also provide option `--dis_spectral_norm` for using spectral normalization (https://arxiv.org/abs/1802.05957). We use the code from the master branch of pytorch since pytorch 0.5.0 is not stable yet. However, despite using spectral normalization significantly stabilizes the training, we fail to observe consistent quality improvement. We encourage everyone to play around with various settings and explore better configurations.
 
 - Since the log file will be large if you want to display the images on tensorboard, set `--no_img_display` if you like to display only the loss values.
+
+## Other implementations
+- [DRIT-Tensorflow](https://github.com/taki0112/DRIT-Tensorflow) by Junho Kim
