@@ -66,5 +66,5 @@ RUN pip3 install http://download.pytorch.org/whl/cu90/torch-0.4.0-cp35-cp35m-lin
 RUN pip3 install torchvision 
 
 ## other packages
-RUN pip3 install tensorboardX==1.2
+RUN pip3 install tensorboardX
 RUN pip3 install tensorflow
