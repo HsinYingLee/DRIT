@@ -55,7 +55,7 @@ bash ../datasets/download_dataset.sh dataset_name
 ## Training Examples
 - Yosemite (summer <-> winter)
 ```
-python3 train.py --dataroot ../datasets/yosemite -name yosemite
+python3 train.py --dataroot ../datasets/yosemite --name yosemite
 tensorboard --logdir ../logs/yosemite
 ```
 Results and saved models can be found at `../results/yosemite`.
