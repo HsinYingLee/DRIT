@@ -7,6 +7,8 @@
 
 Pytorch implementation for our image-to-image translation method. With the proposed disentangled representation framework, we are able to learn **diverse** image-to-image translation from **unpaired** training data.
 
+We have an extension of this work that apply DRIT on the multidomain setting, please refer to [MDMM](https://github.com/HsinYingLee/MDMM) if you're interested in it.
+
 Contact: Hsin-Ying Lee (hlee246@ucmerced.edu) and Hung-Yu Tseng (htseng6@ucmerced.edu)
 
 ## Paper
@@ -102,3 +104,4 @@ Diverse generated winter images can be found at `../outputs/yosemite_encoded`
 
 ## Other implementations
 - [DRIT-Tensorflow](https://github.com/taki0112/DRIT-Tensorflow) by Junho Kim
+- [Multi-Domain Multi-Modality](https://github.com/HsinYingLee/MDMM)
