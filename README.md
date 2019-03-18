@@ -105,3 +105,4 @@ Diverse generated winter images can be found at `../outputs/yosemite_encoded`
 ## Other implementations
 - [DRIT-Tensorflow](https://github.com/taki0112/DRIT-Tensorflow) by Junho Kim
 - [Multi-Domain Multi-Modality](https://github.com/HsinYingLee/MDMM)
+- [DRIT-HighResolution](https://github.com/hytseng0509/DRIT_hr)
