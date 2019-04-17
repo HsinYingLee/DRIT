@@ -7,7 +7,10 @@
 
 Pytorch implementation for our image-to-image translation method. With the proposed disentangled representation framework, we are able to learn **diverse** image-to-image translation from **unpaired** training data.
 
-We have an extension of this work that apply DRIT on the multidomain setting, please refer to [MDMM](https://github.com/HsinYingLee/MDMM) if you're interested in it.
+We have an extension of this work that:
+1. Apply mode-seeking regularization to improve the diversity, please see the
+   training options for details.
+2. Apply DRIT on the multidomain setting, please refer to [MDMM](https://github.com/HsinYingLee/MDMM) if you're interested in it.
 
 Contact: Hsin-Ying Lee (hlee246@ucmerced.edu) and Hung-Yu Tseng (htseng6@ucmerced.edu)
 
@@ -89,6 +92,9 @@ python3 test_transfer.py --dataroot ../datasets/yosemite --name yosemite_encoded
 Diverse generated winter images can be found at `../outputs/yosemite_encoded`
 
 ## Training options and tips
+- Mode seeking regularization is used by default. Set `--no_ms` to disable the
+  regularization.
+
 - Due to the usage of adaptive pooling for attribute encoders, our model supports various input size. For example, here's the result of Grayscale -> RGB using 340x340 images.
 <img src='imgs/flower.png' width="900px"/>
 

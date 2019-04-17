@@ -25,6 +25,7 @@ class TrainOptions():
     self.parser.add_argument('--no_display_img', action='store_true', help='specified if no dispaly')
 
     # training related
+    self.parser.add_argument('--no_ms', action='store_true', help='disable mode seeking regularization')
     self.parser.add_argument('--concat', type=int, default=1, help='concatenate attribute features for translation, set 0 for using feature-wise transform')
     self.parser.add_argument('--dis_scale', type=int, default=3, help='scale of discriminator')
     self.parser.add_argument('--dis_norm', type=str, default='None', help='normalization layer in discriminator [None, Instance]')

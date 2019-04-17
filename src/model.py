@@ -11,6 +11,7 @@ class DRIT(nn.Module):
     lr_dcontent = lr / 2.5
     self.nz = 8
     self.concat = opts.concat
+    self.no_ms = opts.no_ms
 
     # discriminators
     if opts.dis_scale > 1:
@@ -142,16 +143,28 @@ class DRIT(nn.Module):
 
     # get random z_a
     self.z_random = self.get_z_random(self.real_A_encoded.size(0), self.nz, 'gauss')
+    if not self.no_ms:
+      self.z_random2 = self.get_z_random(self.real_A_encoded.size(0), self.nz, 'gauss')
 
     # first cross translation
-    input_content_forA = torch.cat((self.z_content_b, self.z_content_a, self.z_content_b),0)
-    input_content_forB = torch.cat((self.z_content_a, self.z_content_b, self.z_content_a),0)
-    input_attr_forA = torch.cat((self.z_attr_a, self.z_attr_a, self.z_random),0)
-    input_attr_forB = torch.cat((self.z_attr_b, self.z_attr_b, self.z_random),0)
-    output_fakeA = self.gen.forward_a(input_content_forA, input_attr_forA)
-    output_fakeB = self.gen.forward_b(input_content_forB, input_attr_forB)
-    self.fake_A_encoded, self.fake_AA_encoded, self.fake_A_random = torch.split(output_fakeA, self.z_content_a.size(0), dim=0)
-    self.fake_B_encoded, self.fake_BB_encoded, self.fake_B_random = torch.split(output_fakeB, self.z_content_a.size(0), dim=0)
+    if not self.no_ms:
+      input_content_forA = torch.cat((self.z_content_b, self.z_content_a, self.z_content_b, self.z_content_b),0)
+      input_content_forB = torch.cat((self.z_content_a, self.z_content_b, self.z_content_a, self.z_content_a),0)
+      input_attr_forA = torch.cat((self.z_attr_a, self.z_attr_a, self.z_random, self.z_random2),0)
+      input_attr_forB = torch.cat((self.z_attr_b, self.z_attr_b, self.z_random, self.z_random2),0)
+      output_fakeA = self.gen.forward_a(input_content_forA, input_attr_forA)
+      output_fakeB = self.gen.forward_b(input_content_forB, input_attr_forB)
+      self.fake_A_encoded, self.fake_AA_encoded, self.fake_A_random, self.fake_A_random2 = torch.split(output_fakeA, self.z_content_a.size(0), dim=0)
+      self.fake_B_encoded, self.fake_BB_encoded, self.fake_B_random, self.fake_B_random2 = torch.split(output_fakeB, self.z_content_a.size(0), dim=0)
+    else:
+      input_content_forA = torch.cat((self.z_content_b, self.z_content_a, self.z_content_b),0)
+      input_content_forB = torch.cat((self.z_content_a, self.z_content_b, self.z_content_a),0)
+      input_attr_forA = torch.cat((self.z_attr_a, self.z_attr_a, self.z_random),0)
+      input_attr_forB = torch.cat((self.z_attr_b, self.z_attr_b, self.z_random),0)
+      output_fakeA = self.gen.forward_a(input_content_forA, input_attr_forA)
+      output_fakeB = self.gen.forward_b(input_content_forB, input_attr_forB)
+      self.fake_A_encoded, self.fake_AA_encoded, self.fake_A_random = torch.split(output_fakeA, self.z_content_a.size(0), dim=0)
+      self.fake_B_encoded, self.fake_BB_encoded, self.fake_B_random = torch.split(output_fakeB, self.z_content_a.size(0), dim=0)
 
     # get reconstructed encoded z_c
     self.z_content_recon_b, self.z_content_recon_a = self.enc_c.forward(self.fake_A_encoded, self.fake_B_encoded)
@@ -216,6 +229,9 @@ class DRIT(nn.Module):
     self.disA2_opt.zero_grad()
     loss_D2_A = self.backward_D(self.disA2, self.real_A_random, self.fake_A_random)
     self.disA2_loss = loss_D2_A.item()
+    if not self.no_ms:
+      loss_D2_A2 = self.backward_D(self.disA2, self.real_A_random, self.fake_A_random2)
+      self.disA2_loss += loss_D2_A2.item()
     self.disA2_opt.step()
 
     # update disB
@@ -228,6 +244,9 @@ class DRIT(nn.Module):
     self.disB2_opt.zero_grad()
     loss_D2_B = self.backward_D(self.disB2, self.real_B_random, self.fake_B_random)
     self.disB2_loss = loss_D2_B.item()
+    if not self.no_ms:
+      loss_D2_B2 = self.backward_D(self.disB2, self.real_B_random, self.fake_B_random2)
+      self.disB2_loss += loss_D2_B2.item()
     self.disB2_opt.step()
 
     # update disContent
@@ -356,7 +375,17 @@ class DRIT(nn.Module):
     # Ladv for generator
     loss_G_GAN2_A = self.backward_G_GAN(self.fake_A_random, self.disA2)
     loss_G_GAN2_B = self.backward_G_GAN(self.fake_B_random, self.disB2)
-
+    if not self.no_ms:
+      loss_G_GAN2_A2 = self.backward_G_GAN(self.fake_A_random2, self.disA2)
+      loss_G_GAN2_B2 = self.backward_G_GAN(self.fake_B_random2, self.disB2)
+  
+    # mode seeking loss for A-->B and B-->A
+    if not self.no_ms
+      lz_AB = torch.mean(torch.abs(self.fake_B_random2 - self.fake_B_random)) / torch.mean(torch.abs(self.z_random2 - self.z_random))
+      lz_BA = torch.mean(torch.abs(self.fake_A_random2 - self.fake_A_random)) / torch.mean(torch.abs(self.z_random2 - self.z_random))
+      eps = 1 * 1e-5
+      loss_lz_AB = 1 / (lz_AB + eps)
+      loss_lz_BA = 1 / (lz_BA + eps)
     # latent regression loss
     if self.concat:
       loss_z_L1_a = torch.mean(torch.abs(self.mu2_a - self.z_random)) * 10
@@ -366,12 +395,20 @@ class DRIT(nn.Module):
       loss_z_L1_b = torch.mean(torch.abs(self.z_attr_random_b - self.z_random)) * 10
 
     loss_z_L1 = loss_z_L1_a + loss_z_L1_b + loss_G_GAN2_A + loss_G_GAN2_B
+    if not self.no_ms:
+      loss_z_L1 += (loss_G_GAN2_A2 + loss_G_GAN2_B2)
+      loss_z_L1 += (loss_lz_AB + lozz_lz_BA)
     loss_z_L1.backward()
     self.l1_recon_z_loss_a = loss_z_L1_a.item()
     self.l1_recon_z_loss_b = loss_z_L1_b.item()
-    self.gan2_loss_a = loss_G_GAN2_A.item()
-    self.gan2_loss_b = loss_G_GAN2_B.item()
-
+    if not self.no_ms:
+      self.gan2_loss_a = loss_G_GAN2_A.item() + loss_G_GAN2_A2.item()
+      self.gan2_loss_b = loss_G_GAN2_B.item() + loss_G_GAN2_B2.item()
+      self.lz_AB = loss_lz_AB.item()
+      self.lz_BA = loss_lz_BA.item()
+    else:
+      self.gan2_loss_a = loss_G_GAN2_A.item()
+      self.gan2_loss_b = loss_G_GAN2_B.item()
   def update_lr(self):
     self.disA_sch.step()
     self.disB_sch.step()
