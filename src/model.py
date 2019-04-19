@@ -378,9 +378,9 @@ class DRIT(nn.Module):
     if not self.no_ms:
       loss_G_GAN2_A2 = self.backward_G_GAN(self.fake_A_random2, self.disA2)
       loss_G_GAN2_B2 = self.backward_G_GAN(self.fake_B_random2, self.disB2)
-  
+
     # mode seeking loss for A-->B and B-->A
-    if not self.no_ms
+    if not self.no_ms:
       lz_AB = torch.mean(torch.abs(self.fake_B_random2 - self.fake_B_random)) / torch.mean(torch.abs(self.z_random2 - self.z_random))
       lz_BA = torch.mean(torch.abs(self.fake_A_random2 - self.fake_A_random)) / torch.mean(torch.abs(self.z_random2 - self.z_random))
       eps = 1 * 1e-5
@@ -397,7 +397,7 @@ class DRIT(nn.Module):
     loss_z_L1 = loss_z_L1_a + loss_z_L1_b + loss_G_GAN2_A + loss_G_GAN2_B
     if not self.no_ms:
       loss_z_L1 += (loss_G_GAN2_A2 + loss_G_GAN2_B2)
-      loss_z_L1 += (loss_lz_AB + lozz_lz_BA)
+      loss_z_L1 += (loss_lz_AB + loss_lz_BA)
     loss_z_L1.backward()
     self.l1_recon_z_loss_a = loss_z_L1_a.item()
     self.l1_recon_z_loss_b = loss_z_L1_b.item()
