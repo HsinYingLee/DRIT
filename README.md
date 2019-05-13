@@ -3,7 +3,7 @@
 <img src='imgs/final.gif' width="800px">
 
 # Diverse Image-to-Image Translation via Disentangled Representations
-[[Project Page]](http://vllab.ucmerced.edu/hylee/DRIT/)[[Paper]](https://arxiv.org/abs/1808.00948)
+[[Project Page]](http://vllab.ucmerced.edu/hylee/DRIT_pp/)[[Paper]](https://arxiv.org/abs/1905.01270)[[Conference Paper]](https://arxiv.org/abs/1808.00948)
 
 Pytorch implementation for our image-to-image translation method. With the proposed disentangled representation framework, we are able to learn **diverse** image-to-image translation from **unpaired** training data.
 
@@ -15,11 +15,21 @@ We have an extension of this work that:
 Contact: Hsin-Ying Lee (hlee246@ucmerced.edu) and Hung-Yu Tseng (htseng6@ucmerced.edu)
 
 ## Paper
+Please cite our paper if you find the code or dataset useful for your research.
+
+DRIT++: Diverse Image-to-Image Translation viaDisentangled Representations<br>
+[Hsin-Ying Lee](http://vllab.ucmerced.edu/hylee/)\*, [Hung-Yu Tseng](https://sites.google.com/site/hytseng0509/)\*, [Qi Mao](https://sites.google.com/view/qi-mao/)\*, [Jia-Bin Huang](https://filebox.ece.vt.edu/~jbhuang/), [Yu-Ding Lu](https://jonlu0602.github.io/), [Maneesh Kumar Singh](https://scholar.google.com/citations?user=hdQhiFgAAAAJ), and [Ming-Hsuan Yang](http://faculty.ucmerced.edu/mhyang/)<br>
+```
+@article{DRIT_plus,
+  author = {Lee, Hsin-Ying and Tseng, Hung-Yu and Mao, Qi and Huang, Jia-Bin and Lu, Yu-Ding and Singh, Maneesh Kumar and Yang, Ming-Hsuan},
+  title = {DRIT++: Diverse Image-to-Image Translation viaDisentangled Representations},
+  journal = {arXiv preprint},
+  year = {2019}
+}
+```
 Diverse Image-to-Image Translation via Disentangled Representations<br>
 [Hsin-Ying Lee](http://vllab.ucmerced.edu/hylee/)\*, [Hung-Yu Tseng](https://sites.google.com/site/hytseng0509/)\*, [Jia-Bin Huang](https://filebox.ece.vt.edu/~jbhuang/), [Maneesh Kumar Singh](https://scholar.google.com/citations?user=hdQhiFgAAAAJ), and [Ming-Hsuan Yang](http://faculty.ucmerced.edu/mhyang/)<br>
 European Conference on Computer Vision (ECCV), 2018 (**oral**) (* equal contribution)
-
-Please cite our paper if you find the code or dataset useful for your research.
 ```
 @inproceedings{DRIT,
   author = {Lee, Hsin-Ying and Tseng, Hung-Yu and Huang, Jia-Bin and Singh, Maneesh Kumar and Yang, Ming-Hsuan},
