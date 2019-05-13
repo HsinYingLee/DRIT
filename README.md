@@ -2,7 +2,7 @@
 
 <img src='imgs/final.gif' width="800px">
 
-# Diverse Image-to-Image Translation via Disentangled Representations
+# DRIT++: Diverse Image-to-Image Translation via Disentangled Representations
 [[Project Page]](http://vllab.ucmerced.edu/hylee/DRIT_pp/)[[Paper]](https://arxiv.org/abs/1905.01270)[[Conference Paper]](https://arxiv.org/abs/1808.00948)
 
 Pytorch implementation for our image-to-image translation method. With the proposed disentangled representation framework, we are able to learn **diverse** image-to-image translation from **unpaired** training data.
