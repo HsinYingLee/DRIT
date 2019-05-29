@@ -66,6 +66,7 @@ class TestOptions():
 
     # model related
     self.parser.add_argument('--concat', type=int, default=1, help='concatenate attribute features for translation, set 0 for using feature-wise transform')
+    self.parser.add_argument('--no_ms', action='store_true', help='disable mode seeking regularization')
     self.parser.add_argument('--resume', type=str, required=True, help='specified the dir of saved models for resume the training')
     self.parser.add_argument('--gpu', type=int, default=0, help='gpu')
 
