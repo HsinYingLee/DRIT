@@ -39,7 +39,7 @@ class Saver():
       os.makedirs(self.image_dir)
 
     # create tensorboard writer
-    self.writer = SummaryWriter(log_dir=self.display_dir)
+    self.writer = SummaryWriter(logdir=self.display_dir)
 
   # write losses and images to tensorboard
   def write_display(self, total_it, model):
