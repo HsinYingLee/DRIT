@@ -23,8 +23,10 @@ DRIT++: Diverse Image-to-Image Translation via Disentangled Representations<br>
 @article{DRIT_plus,
   author = {Lee, Hsin-Ying and Tseng, Hung-Yu and Mao, Qi and Huang, Jia-Bin and Lu, Yu-Ding and Singh, Maneesh Kumar and Yang, Ming-Hsuan},
   title = {DRIT++: Diverse Image-to-Image Translation viaDisentangled Representations},
-  journal = {arXiv preprint arXiv:1905.01270},
-  year = {2019}
+  journal={International Journal of Computer Vision},
+  pages={1--16},
+  year={2020}
+}
 }
 ```
 <br>Diverse Image-to-Image Translation via Disentangled Representations<br>
