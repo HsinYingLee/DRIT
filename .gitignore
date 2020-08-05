@@ -6,6 +6,8 @@ debug*
 videos/
 build/
 dist/
+datasets/portrait/
+logs/
 torch.egg-info/
 */**/__pycache__
 torch/version.py
