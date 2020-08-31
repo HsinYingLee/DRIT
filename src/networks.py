@@ -504,7 +504,7 @@ class LeakyReLUConv2d(nn.Module):
       model += [spectral_norm(nn.Conv2d(n_in, n_out, kernel_size=kernel_size, stride=stride, padding=0, bias=True))]
     else:
       model += [nn.Conv2d(n_in, n_out, kernel_size=kernel_size, stride=stride, padding=0, bias=True)]
-    if 'norm' == 'Instance':
+    if norm == 'Instance':
       model += [nn.InstanceNorm2d(n_out, affine=False)]
     model += [nn.LeakyReLU(inplace=True)]
     self.model = nn.Sequential(*model)
